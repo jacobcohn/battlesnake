@@ -1,4 +1,5 @@
 #include <crow.h>
+#include <string>
 
 crow::response get_info() {
   crow::json::wvalue info;
@@ -12,15 +13,61 @@ crow::response get_info() {
   return response;
 }
 
-crow::response start_game(const crow::request& request) {
+std::string select_move(int board_width, int board_height, int head_x, int head_y) {
+  if (head_y + 1 < board_height) {
+    return "up";
+  }
+
+  if (head_x + 1 < board_width) {
+    return "right";
+  }
+
+  if (head_y - 1 >= 0) {
+    return "down";
+  }
+
+  return "left";
+}
+
+crow::response start(const crow::request& request) {
+  crow::json::rvalue body = crow::json::load(request.body);
+
+  if (!body) {
+    return crow::response{400, "invalid JSON"};
+  }
+
   return crow::response{};
 }
 
-crow::response select_move(const crow::request& request) {
-  return crow::response{};
+crow::response move(const crow::request& request) {
+  crow::json::rvalue body = crow::json::load(request.body);
+
+  if (!body) {
+    return crow::response{400, "invalid JSON"};
+  }
+
+  int board_width = body["board"]["width"].i();
+  int board_height = body["board"]["height"].i();
+  int head_x = body["you"]["head"]["x"].i();
+  int head_y = body["you"]["head"]["y"].i();
+
+  std::string selected_move = select_move(board_width, board_height, head_x, head_y);
+
+  crow::json::wvalue response_body;
+  response_body["move"] = selected_move;
+
+  crow::response response{response_body.dump()};
+  response.set_header("Content-Type", "application/json");
+  return response;
 }
 
-crow::response end_game(const crow::request& request) {
+crow::response end(const crow::request& request) {
+  crow::json::rvalue body = crow::json::load(request.body);
+
+  if (!body) {
+    return crow::response{400, "invalid JSON"};
+  }
+
   return crow::response{};
 }
 
@@ -28,9 +75,9 @@ int main() {
   crow::SimpleApp app;
 
   CROW_ROUTE(app, "/")(get_info);
-  CROW_ROUTE(app, "/start").methods(crow::HTTPMethod::POST)(start_game);
-  CROW_ROUTE(app, "/move").methods(crow::HTTPMethod::POST)(select_move);
-  CROW_ROUTE(app, "/end").methods(crow::HTTPMethod::POST)(end_game);
+  CROW_ROUTE(app, "/start").methods(crow::HTTPMethod::POST)(start);
+  CROW_ROUTE(app, "/move").methods(crow::HTTPMethod::POST)(move);
+  CROW_ROUTE(app, "/end").methods(crow::HTTPMethod::POST)(end);
 
   app.port(8080).run();
 }
