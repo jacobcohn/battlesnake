@@ -7,5 +7,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Crow REQUIRED)
 
-add_executable(battlesnake main.cpp)
+add_executable(battlesnake src/main.cpp src/select_move.cpp)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)

@@ -1,5 +1,6 @@
 #include <crow.h>
-#include <string>
+
+#include "select_move.h"
 
 crow::response get_info() {
   crow::json::wvalue info;
@@ -11,22 +12,6 @@ crow::response get_info() {
   crow::response response{info.dump()};
   response.set_header("Content-Type", "application/json");
   return response;
-}
-
-std::string select_move(int board_width, int board_height, int head_x, int head_y) {
-  if (head_y + 1 < board_height) {
-    return "up";
-  }
-
-  if (head_x + 1 < board_width) {
-    return "right";
-  }
-
-  if (head_y - 1 >= 0) {
-    return "down";
-  }
-
-  return "left";
 }
 
 crow::response start(const crow::request& request) {
