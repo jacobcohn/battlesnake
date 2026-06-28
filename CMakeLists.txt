@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Crow REQUIRED)
 
-add_executable(battlesnake src/main.cpp src/select_move.cpp src/parse.cpp src/move.cpp src/simulate.cpp src/evaluate.cpp)
+add_executable(battlesnake src/main.cpp src/select_move.cpp src/parse.cpp src/move.cpp src/simulate.cpp src/evaluate.cpp src/minimax.cpp)
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
 
@@ -19,5 +19,9 @@ target_include_directories(simulate_test PRIVATE include tests)
 add_executable(evaluate_test tests/evaluate_test.cpp tests/test_helpers.cpp src/evaluate.cpp)
 target_include_directories(evaluate_test PRIVATE include tests)
 
+add_executable(minimax_test tests/minimax_test.cpp tests/test_helpers.cpp src/minimax.cpp src/simulate.cpp src/evaluate.cpp src/move.cpp)
+target_include_directories(minimax_test PRIVATE include tests)
+
 add_test(NAME simulate_test COMMAND simulate_test)
 add_test(NAME evaluate_test COMMAND evaluate_test)
+add_test(NAME minimax_test COMMAND minimax_test)
