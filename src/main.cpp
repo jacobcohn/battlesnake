@@ -1,5 +1,6 @@
 #include <crow.h>
 
+#include "parse.h"
 #include "select_move.h"
 
 crow::response get_info() {
@@ -31,12 +32,8 @@ crow::response move(const crow::request& request) {
     return crow::response{400, "invalid JSON"};
   }
 
-  int board_width = body["board"]["width"].i();
-  int board_height = body["board"]["height"].i();
-  int head_x = body["you"]["head"]["x"].i();
-  int head_y = body["you"]["head"]["y"].i();
-
-  std::string selected_move = select_move(board_width, board_height, head_x, head_y);
+  GameState state = parse_game_state(body);
+  std::string selected_move = select_move(state);
 
   crow::json::wvalue response_body;
   response_body["move"] = selected_move;

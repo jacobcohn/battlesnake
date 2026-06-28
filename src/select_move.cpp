@@ -1,15 +1,23 @@
 #include "select_move.h"
 
-std::string select_move(int board_width, int board_height, int head_x, int head_y) {
-  if (head_y + 1 < board_height) {
+std::string select_move(const GameState& state, int search_depth) {
+  (void)search_depth;
+
+  if (state.you.body.empty()) {
     return "up";
   }
 
-  if (head_x + 1 < board_width) {
+  const Coordinate& head = state.you.body.front();
+
+  if (head.y + 1 < state.board_height) {
+    return "up";
+  }
+
+  if (head.x + 1 < state.board_width) {
     return "right";
   }
 
-  if (head_y - 1 >= 0) {
+  if (head.y - 1 >= 0) {
     return "down";
   }
 
