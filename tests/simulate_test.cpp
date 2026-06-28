@@ -1,27 +1,7 @@
 #include <cassert>
-#include <string>
-#include <vector>
 
 #include "simulate.h"
-
-Snake make_snake(std::string id, std::vector<Coordinate> body, int health = 100) {
-  Snake snake;
-  snake.id = id;
-  snake.body = body;
-  snake.health = health;
-  snake.alive = true;
-  return snake;
-}
-
-GameState make_state(Snake you, Snake opponent, std::vector<Coordinate> food = {}) {
-  GameState state;
-  state.you = you;
-  state.opponent = opponent;
-  state.food = food;
-  state.board_width = 11;
-  state.board_height = 11;
-  return state;
-}
+#include "test_helpers.h"
 
 void test_wall_death() {
   GameState state = make_state(make_snake("you", {{0, 0}}), make_snake("opponent", {{5, 5}}));
