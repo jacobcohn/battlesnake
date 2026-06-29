@@ -1,12 +1,13 @@
 #include <crow.h>
 
-#include <iostream>
+#include <chrono>
 
+#include "logging.h"
 #include "minimax.h"
 #include "move.h"
 #include "parse.h"
 
-constexpr int SEARCH_DEPTH = 4;
+constexpr std::chrono::milliseconds MOVE_LATENCY_BUDGET{300};
 
 crow::response get_info() {
   crow::json::wvalue info;
@@ -18,20 +19,6 @@ crow::response get_info() {
   crow::response response{info.dump()};
   response.set_header("Content-Type", "application/json");
   return response;
-}
-
-void log_minimax_stats(Move selected_move, const MinimaxStats& minimax_stats) {
-  std::cout << "minimax depth=" << minimax_stats.depth
-    << " nodes=" << minimax_stats.nodes_evaluated
-    << " elapsed_ms=" << minimax_stats.elapsed_ms
-    << " selected=" << move_to_string(selected_move)
-    << " scores=";
-
-  for (const MinimaxMoveScore& move_score : minimax_stats.top_level_scores) {
-    std::cout << move_to_string(move_score.move) << "=" << move_score.score << " ";
-  }
-
-  std::cout << std::endl;
 }
 
 crow::response start(const crow::request& request) {
@@ -52,9 +39,9 @@ crow::response move(const crow::request& request) {
   }
 
   GameState state = parse_game_state(body);
-  MinimaxStats minimax_stats;
-  Move selected_move = choose_minimax_move(state, SEARCH_DEPTH, minimax_stats);
 
+  MinimaxStats minimax_stats;
+  Move selected_move = choose_minimax_move(state, MOVE_LATENCY_BUDGET, minimax_stats);
   log_minimax_stats(selected_move, minimax_stats);
 
   crow::json::wvalue response_body;

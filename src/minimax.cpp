@@ -1,87 +1,143 @@
 #include "minimax.h"
 
+#include <algorithm>
 #include <chrono>
 #include <limits>
-#include <random>
-#include <vector>
 
 #include "evaluate.h"
 #include "simulate.h"
 
 namespace {
 
-int minimax_score(const GameState& state, int depth, MinimaxStats& stats);
+constexpr int MAX_ITERATIVE_DEEPENING_DEPTH = 64;
 
-int score_move(const GameState& state, Move you_move, int depth, MinimaxStats& stats) {
-  int worst_score = std::numeric_limits<int>::max();
+struct BestMoveResult {
+  Move selected_move = Move::Up;
+  int score = std::numeric_limits<int>::min();
+};
 
-  for (Move opponent_move : ALL_MOVES) {
-    GameState next_state = simulate_turn(state, you_move, opponent_move);
-    int score = minimax_score(next_state, depth - 1, stats);
-    worst_score = std::min(worst_score, score);
-  }
-
-  return worst_score;
+bool search_deadline_expired(std::chrono::steady_clock::time_point deadline) {
+  return std::chrono::steady_clock::now() >= deadline;
 }
 
-int minimax_score(const GameState& state, int depth, MinimaxStats& stats) {
+BestMoveResult search_best_you_move(const GameState& state, int depth, int alpha, int beta, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats);
+int score_best_you_move(const GameState& state, int depth, int alpha, int beta, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats);
+
+int score_position(const GameState& state, int depth, int alpha, int beta, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats) {
+  if (search_deadline_expired(deadline)) {
+    return std::numeric_limits<int>::min();
+  }
+
   if (depth <= 0 || !state.you.alive || !state.opponent.alive) {
     ++stats.nodes_evaluated;
     return evaluate_state(state);
   }
 
-  int best_score = std::numeric_limits<int>::min();
-
-  for (Move you_move : ALL_MOVES) {
-    best_score = std::max(best_score, score_move(state, you_move, depth, stats));
-  }
-
-  return best_score;
+  return score_best_you_move(state, depth, alpha, beta, deadline, stats);
 }
 
-std::vector<Move> best_moves_for_depth(const GameState& state, int depth, MinimaxStats& stats) {
-  std::vector<Move> best_moves;
-  int best_score = std::numeric_limits<int>::min();
+int score_worst_opponent_response(const GameState& state, Move you_move, int depth, int alpha, int beta, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats) {
+  int worst_score = std::numeric_limits<int>::max();
 
-  for (Move you_move : ALL_MOVES) {
-    int move_score = score_move(state, you_move, depth, stats);
-    stats.top_level_scores.push_back({you_move, move_score});
+  for (Move opponent_move : ALL_MOVES) {
+    if (search_deadline_expired(deadline)) {
+      return worst_score;
+    }
 
-    if (move_score > best_score) {
-      best_score = move_score;
-      best_moves.clear();
-      best_moves.push_back(you_move);
-    } else if (move_score == best_score) {
-      best_moves.push_back(you_move);
+    GameState next_state = simulate_turn(state, you_move, opponent_move);
+
+    int score = score_position(next_state, depth - 1, alpha, beta, deadline, stats);
+    worst_score = std::min(worst_score, score);
+
+    beta = std::min(beta, worst_score);
+    if (beta <= alpha) {
+      ++stats.branches_pruned;
+      break;
     }
   }
 
-  return best_moves;
+  return worst_score;
 }
 
-Move choose_random_move(const std::vector<Move>& moves) {
-  static std::random_device random_device;
-  static std::mt19937 generator(random_device());
+BestMoveResult search_best_you_move(const GameState& state, int depth, int alpha, int beta, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats) {
+  BestMoveResult result;
 
-  std::uniform_int_distribution<std::size_t> distribution(0, moves.size() - 1);
-  return moves[distribution(generator)];
-}
+  for (Move you_move : ALL_MOVES) {
+    if (search_deadline_expired(deadline)) {
+      return result;
+    }
 
-}
+    int score = score_worst_opponent_response(state, you_move, depth, alpha, beta, deadline, stats);
+    if (score > result.score) {
+      result.score = score;
+      result.selected_move = you_move;
+    }
 
-Move choose_minimax_move(const GameState& state, int depth, MinimaxStats& stats) {
-  stats = MinimaxStats{};
-  stats.depth = depth;
-
-  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
-  std::vector<Move> best_moves = best_moves_for_depth(state, depth, stats);
-  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
-
-  stats.elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-  if (best_moves.empty()) {
-    return Move::Up;
+    alpha = std::max(alpha, result.score);
+    if (alpha >= beta) {
+      ++stats.branches_pruned;
+      break;
+    }
   }
 
-  return choose_random_move(best_moves);
+  return result;
+}
+
+int score_best_you_move(const GameState& state, int depth, int alpha, int beta, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats) {
+  return search_best_you_move(state, depth, alpha, beta, deadline, stats).score;
+}
+
+BestMoveResult search_depth(const GameState& state, int depth, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats) {
+  return search_best_you_move(state, depth, std::numeric_limits<int>::min(), std::numeric_limits<int>::max(), deadline, stats);
+}
+
+bool search_and_record_depth(const GameState& state, int depth, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats, Move& selected_move) {
+  int nodes_before_depth = stats.nodes_evaluated;
+  int prunes_before_depth = stats.branches_pruned;
+  std::chrono::steady_clock::time_point depth_start = std::chrono::steady_clock::now();
+
+  BestMoveResult result = search_depth(state, depth, deadline, stats);
+  if (search_deadline_expired(deadline)) {
+    return false;
+  }
+  
+  stats.completed_depth = depth;
+  stats.depth_stats.push_back({
+    depth,
+    result.selected_move,
+    stats.nodes_evaluated - nodes_before_depth,
+    stats.branches_pruned - prunes_before_depth,
+    static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - depth_start).count()),
+  });
+
+  selected_move = result.selected_move;
+  return true;
+}
+
+Move search_with_iterative_deepening(const GameState& state, std::chrono::steady_clock::time_point deadline, MinimaxStats& stats) {
+  Move selected_move = Move::Up;
+
+  for (int depth = 1; depth <= MAX_ITERATIVE_DEEPENING_DEPTH; ++depth) {
+    if (!search_and_record_depth(state, depth, deadline, stats, selected_move)) {
+      break;
+    }
+  }
+
+  return selected_move;
+}
+
+}
+
+Move choose_minimax_move(const GameState& state, std::chrono::milliseconds latency_budget, MinimaxStats& stats) {
+  stats = MinimaxStats{};
+  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  std::chrono::steady_clock::time_point deadline = start + latency_budget;
+
+  Move selected_move = search_with_iterative_deepening(state, deadline, stats);
+
+  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+  stats.elapsed_ms = static_cast<int>(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+  stats.timed_out = search_deadline_expired(deadline);
+
+  return selected_move;
 }
