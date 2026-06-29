@@ -15,7 +15,8 @@ void chooses_only_surviving_move() {
     5,
     5);
 
-  Move move = choose_minimax_move(state, 1);
+  MinimaxStats stats;
+  Move move = choose_minimax_move(state, 1, stats);
 
   assert(move == Move::Up);
 }
@@ -28,7 +29,8 @@ void chooses_food_when_safe() {
     7,
     7);
 
-  Move move = choose_minimax_move(state, 1);
+  MinimaxStats stats;
+  Move move = choose_minimax_move(state, 1, stats);
 
   assert(move == Move::Up);
 }

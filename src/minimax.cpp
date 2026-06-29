@@ -1,5 +1,6 @@
 #include "minimax.h"
 
+#include <chrono>
 #include <limits>
 #include <random>
 #include <vector>
@@ -9,40 +10,42 @@
 
 namespace {
 
-int minimax_score(const GameState& state, int depth);
+int minimax_score(const GameState& state, int depth, MinimaxStats& stats);
 
-int score_move(const GameState& state, Move you_move, int depth) {
+int score_move(const GameState& state, Move you_move, int depth, MinimaxStats& stats) {
   int worst_score = std::numeric_limits<int>::max();
 
   for (Move opponent_move : ALL_MOVES) {
     GameState next_state = simulate_turn(state, you_move, opponent_move);
-    int score = minimax_score(next_state, depth - 1);
+    int score = minimax_score(next_state, depth - 1, stats);
     worst_score = std::min(worst_score, score);
   }
 
   return worst_score;
 }
 
-int minimax_score(const GameState& state, int depth) {
+int minimax_score(const GameState& state, int depth, MinimaxStats& stats) {
   if (depth == 0 || !state.you.alive || !state.opponent.alive) {
+    ++stats.nodes_evaluated;
     return evaluate_state(state);
   }
 
   int best_score = std::numeric_limits<int>::min();
 
   for (Move you_move : ALL_MOVES) {
-    best_score = std::max(best_score, score_move(state, you_move, depth));
+    best_score = std::max(best_score, score_move(state, you_move, depth, stats));
   }
 
   return best_score;
 }
 
-std::vector<Move> best_moves_for_depth(const GameState& state, int depth) {
+std::vector<Move> best_moves_for_depth(const GameState& state, int depth, MinimaxStats& stats) {
   std::vector<Move> best_moves;
   int best_score = std::numeric_limits<int>::min();
 
   for (Move you_move : ALL_MOVES) {
-    int move_score = score_move(state, you_move, depth);
+    int move_score = score_move(state, you_move, depth, stats);
+    stats.top_level_scores.push_back({you_move, move_score});
 
     if (move_score > best_score) {
       best_score = move_score;
@@ -66,8 +69,15 @@ Move choose_random_move(const std::vector<Move>& moves) {
 
 }
 
-Move choose_minimax_move(const GameState& state, int depth) {
-  std::vector<Move> best_moves = best_moves_for_depth(state, depth);
+Move choose_minimax_move(const GameState& state, int depth, MinimaxStats& stats) {
+  stats = MinimaxStats{};
+  stats.depth = depth;
+
+  std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+  std::vector<Move> best_moves = best_moves_for_depth(state, depth, stats);
+  std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+  stats.elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 
   if (best_moves.empty()) {
     return Move::Up;
