@@ -25,7 +25,7 @@ int score_move(const GameState& state, Move you_move, int depth, MinimaxStats& s
 }
 
 int minimax_score(const GameState& state, int depth, MinimaxStats& stats) {
-  if (depth == 0 || !state.you.alive || !state.opponent.alive) {
+  if (depth <= 0 || !state.you.alive || !state.opponent.alive) {
     ++stats.nodes_evaluated;
     return evaluate_state(state);
   }

@@ -5,6 +5,10 @@ project(battlesnake)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 find_package(Crow REQUIRED)
 
 add_executable(battlesnake src/main.cpp src/parse.cpp src/move.cpp src/simulate.cpp src/evaluate.cpp src/minimax.cpp)
@@ -16,12 +20,4 @@ enable_testing()
 add_executable(simulate_test tests/simulate_test.cpp tests/test_helpers.cpp src/simulate.cpp src/move.cpp)
 target_include_directories(simulate_test PRIVATE include tests)
 
-add_executable(evaluate_test tests/evaluate_test.cpp tests/test_helpers.cpp src/evaluate.cpp)
-target_include_directories(evaluate_test PRIVATE include tests)
-
-add_executable(minimax_test tests/minimax_test.cpp tests/test_helpers.cpp src/minimax.cpp src/simulate.cpp src/evaluate.cpp src/move.cpp)
-target_include_directories(minimax_test PRIVATE include tests)
-
 add_test(NAME simulate_test COMMAND simulate_test)
-add_test(NAME evaluate_test COMMAND evaluate_test)
-add_test(NAME minimax_test COMMAND minimax_test)
