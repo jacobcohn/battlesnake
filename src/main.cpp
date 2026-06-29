@@ -6,7 +6,7 @@
 #include "move.h"
 #include "parse.h"
 
-constexpr int SEARCH_DEPTH = 6;
+constexpr int SEARCH_DEPTH = 4;
 
 crow::response get_info() {
   crow::json::wvalue info;
