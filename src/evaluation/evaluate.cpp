@@ -4,16 +4,18 @@
 #include "evaluation/territory.h"
 
 namespace {
+
 constexpr int WIN_SCORE = 1'000'000;
 constexpr int LOSS_SCORE = -1'000'000;
 constexpr int DRAW_SCORE = -900'000;
-constexpr int HEALTH_WEIGHT = 1;
-constexpr int LENGTH_WEIGHT = 25;
-constexpr int REACHABLE_SPACE_WEIGHT = 8;
-constexpr int TERRITORY_CONTROL_WEIGHT = 10;
-}
 
-int evaluate_state(const GameState& state) {
+constexpr int REACHABLE_SPACE_WEIGHT = 3;
+constexpr int TERRITORY_CONTROL_WEIGHT = 12;
+constexpr int LENGTH_ADVANTAGE_SCORE = 75;
+constexpr int LOW_HEALTH_THRESHOLD = 25;
+constexpr int LOW_HEALTH_PENALTY_WEIGHT = 15;
+
+int evaluate_terminal_state(const GameState& state) {
   if (state.you.alive && !state.opponent.alive) {
     return WIN_SCORE;
   }
@@ -26,15 +28,52 @@ int evaluate_state(const GameState& state) {
     return DRAW_SCORE;
   }
 
-  int health_difference = state.you.health - state.opponent.health;
-  int length_difference = static_cast<int>(state.you.body.size()) - static_cast<int>(state.opponent.body.size());
-  int reachable_space_difference = count_reachable_space_from_head(state, state.you) - count_reachable_space_from_head(state, state.opponent);
-  int territory_control = evaluate_territory_control(state);
+  return 0;
+}
 
-  int health_score = HEALTH_WEIGHT * health_difference;
-  int length_score = LENGTH_WEIGHT * length_difference;
-  int reachable_space_score = REACHABLE_SPACE_WEIGHT * reachable_space_difference;
-  int territory_control_score = TERRITORY_CONTROL_WEIGHT * territory_control;
+int evaluate_health(const GameState& state) {
+  if (state.you.health < LOW_HEALTH_THRESHOLD) {
+    return -(LOW_HEALTH_THRESHOLD - state.you.health) * LOW_HEALTH_PENALTY_WEIGHT;
+  }
 
-  return health_score + length_score + reachable_space_score + territory_control_score;
+  return 0;
+}
+
+int evaluate_length_advantage(const GameState& state) {
+  if (state.you.body.size() > state.opponent.body.size()) {
+    return LENGTH_ADVANTAGE_SCORE;
+  }
+
+  if (state.you.body.size() < state.opponent.body.size()) {
+    return -LENGTH_ADVANTAGE_SCORE;
+  }
+
+  return 0;
+}
+
+int evaluate_reachable_space(const GameState& state) {
+  int you_reachable_space = count_reachable_space_from_head(state, state.you);
+  int opponent_reachable_space = count_reachable_space_from_head(state, state.opponent);
+  int reachable_space_difference = you_reachable_space - opponent_reachable_space;
+
+  return REACHABLE_SPACE_WEIGHT * reachable_space_difference;
+}
+
+int evaluate_territory_control_score(const GameState& state) {
+  return TERRITORY_CONTROL_WEIGHT * evaluate_territory_control(state);
+}
+
+}
+
+int evaluate_state(const GameState& state) {
+  if (!state.you.alive || !state.opponent.alive) {
+    return evaluate_terminal_state(state);
+  }
+
+  int score = 0;
+  score += evaluate_health(state);
+  score += evaluate_length_advantage(state);
+  score += evaluate_reachable_space(state);
+  score += evaluate_territory_control_score(state);
+  return score;
 }
