@@ -11,7 +11,7 @@ endif()
 
 find_package(Crow REQUIRED)
 
-add_executable(battlesnake src/main.cpp src/evaluate.cpp src/flood_fill.cpp src/logging.cpp src/minimax.cpp src/move.cpp src/parse.cpp src/simulate.cpp)
+add_executable(battlesnake src/main.cpp src/evaluation/evaluate.cpp src/evaluation/flood_fill.cpp src/evaluation/grid.cpp src/evaluation/territory.cpp src/logging.cpp src/minimax.cpp src/move.cpp src/parse.cpp src/simulate.cpp)
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
 

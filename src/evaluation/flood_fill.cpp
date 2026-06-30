@@ -1,41 +1,10 @@
-#include "flood_fill.h"
+#include "evaluation/flood_fill.h"
 
 #include <queue>
-#include <vector>
+
+#include "evaluation/grid.h"
 
 namespace {
-
-using Grid = std::vector<std::vector<bool>>;
-
-constexpr Coordinate DIRECTIONS[] = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-
-bool is_out_of_bounds(Coordinate coordinate, int board_width, int board_height) {
-  if (coordinate.x < 0) {
-    return true;
-  }
-
-  if (coordinate.x >= board_width) {
-    return true;
-  }
-
-  if (coordinate.y < 0) {
-    return true;
-  }
-
-  if (coordinate.y >= board_height) {
-    return true;
-  }
-
-  return false;
-}
-
-void mark_snake_body_as_blocked(Grid& blocked, const Snake& snake, int board_width, int board_height) {
-  for (Coordinate coordinate : snake.body) {
-    if (!is_out_of_bounds(coordinate, board_width, board_height)) {
-      blocked[coordinate.y][coordinate.x] = true;
-    }
-  }
-}
 
 bool can_visit(Coordinate coordinate, const GameState& state, const Grid& blocked, const Grid& visited) {
   if (is_out_of_bounds(coordinate, state.board_width, state.board_height)) {
@@ -93,9 +62,7 @@ int count_reachable_space_from_head(const GameState& state, const Snake& snake) 
     return 0;
   }
 
-  Grid blocked(state.board_height, std::vector<bool>(state.board_width, false));
-  mark_snake_body_as_blocked(blocked, state.you, state.board_width, state.board_height);
-  mark_snake_body_as_blocked(blocked, state.opponent, state.board_width, state.board_height);
+  Grid blocked = build_blocked_grid(state);
   blocked[start.y][start.x] = false;
 
   return count_reachable_space(state, start, blocked);
