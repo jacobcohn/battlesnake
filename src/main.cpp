@@ -7,7 +7,7 @@
 #include "move.h"
 #include "parse.h"
 
-constexpr std::chrono::milliseconds MOVE_LATENCY_BUDGET{300};
+constexpr std::chrono::milliseconds MOVE_LATENCY_BUDGET{400};
 
 crow::response get_info() {
   crow::json::wvalue info;
