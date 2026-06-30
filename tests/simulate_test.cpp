@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "simulate.h"
+#include "play/simulate.h"
 #include "test_helpers.h"
 
 void test_wall_death() {

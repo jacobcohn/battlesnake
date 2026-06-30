@@ -5,7 +5,7 @@
 
 #include "evaluation/params.h"
 #include "game_state.h"
-#include "move.h"
+#include "play/move.h"
 
 struct MinimaxDepthStats {
   int depth = 0;

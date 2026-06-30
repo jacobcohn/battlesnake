@@ -4,7 +4,7 @@
 
 #include "logging.h"
 #include "minimax.h"
-#include "move.h"
+#include "play/move.h"
 #include "parse.h"
 
 constexpr std::chrono::milliseconds MOVE_LATENCY_BUDGET{400};

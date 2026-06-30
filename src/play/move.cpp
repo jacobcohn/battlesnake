@@ -1,4 +1,4 @@
-#include "move.h"
+#include "play/move.h"
 
 Coordinate apply_move(Coordinate coordinate, Move move) {
   switch (move) {

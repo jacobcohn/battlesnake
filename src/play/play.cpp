@@ -5,7 +5,7 @@
 #include "minimax.h"
 #include "play/food.h"
 #include "play/starting_position.h"
-#include "simulate.h"
+#include "play/simulate.h"
 
 namespace {
 
