@@ -25,6 +25,7 @@ if(BUILD_TESTING)
 
   add_executable(battlesnake_tests
     tests/test_main.cpp
+    tests/engine/test_square.cpp
   )
   target_include_directories(battlesnake_tests PRIVATE include)
   target_link_libraries(battlesnake_tests PRIVATE doctest::doctest)
