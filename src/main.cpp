@@ -1,6 +1,9 @@
 #include <chrono>
+#include <exception>
 
 #include <crow.h>
+
+#include "server/parser.hpp"
 
 crow::response get_info() {
   crow::json::wvalue info;
@@ -31,12 +34,25 @@ crow::response move(const crow::request& request) {
     return crow::response{400, "invalid JSON"};
   }
 
-  crow::json::wvalue response_body;
-  response_body["move"] = "up";
+  try {
+    [[maybe_unused]] Position position = parse_position(body);
 
-  crow::response response{response_body.dump()};
-  response.set_header("Content-Type", "application/json");
-  return response;
+    // TODO: call engine/search move selection
+    crow::json::wvalue response_body;
+    response_body["move"] = "up";
+
+    crow::response response{response_body.dump()};
+    response.set_header("Content-Type", "application/json");
+    return response;
+
+  } catch (const std::exception& exception) {
+    crow::json::wvalue response_body;
+    response_body["error"] = exception.what();
+
+    crow::response response{400, response_body.dump()};
+    response.set_header("Content-Type", "application/json");
+    return response;
+  }
 }
 
 crow::response end(const crow::request& request) {

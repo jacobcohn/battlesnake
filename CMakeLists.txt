@@ -11,6 +11,9 @@ endif()
 
 find_package(Crow REQUIRED)
 
-add_executable(battlesnake src/main.cpp)
+add_executable(battlesnake
+  src/main.cpp
+  src/server/parser.cpp
+)
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
