@@ -17,3 +17,17 @@ add_executable(battlesnake
 )
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
+
+include(CTest)
+
+if(BUILD_TESTING)
+  find_package(doctest CONFIG REQUIRED)
+
+  add_executable(battlesnake_tests
+    tests/test_main.cpp
+  )
+  target_include_directories(battlesnake_tests PRIVATE include)
+  target_link_libraries(battlesnake_tests PRIVATE doctest::doctest)
+
+  add_test(NAME battlesnake_tests COMMAND battlesnake_tests)
+endif()
