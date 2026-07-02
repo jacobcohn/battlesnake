@@ -8,71 +8,71 @@
 #include "square.hpp"
 
 struct BitBoard {
-  uint64_t lo = 0;
-  uint64_t hi = 0;
+  uint64_t low = 0;
+  uint64_t high = 0;
 
-  static constexpr uint64_t HI_USED_MASK = (uint64_t{1} << (BOARD_SQUARES - 64)) - 1;
+  static constexpr uint64_t HIGH_USED_MASK = (uint64_t{1} << (BOARD_SQUARES - 64)) - 1;
 
-  [[nodiscard]] static constexpr BitBoard single(Square sq) noexcept {
-    BitBoard bb;
-    bb.set(sq);
-    return bb;
+  [[nodiscard]] static constexpr BitBoard single(Square square) noexcept {
+    BitBoard bitBoard;
+    bitBoard.set(square);
+    return bitBoard;
   }
 
-  constexpr void set(Square sq) noexcept {
-    assert(sq >= 0 && sq < BOARD_SQUARES);
-    if (sq < 64) {
-      lo |= uint64_t{1} << sq;
+  constexpr void set(Square square) noexcept {
+    assert(square >= 0 && square < BOARD_SQUARES);
+    if (square < 64) {
+      low |= uint64_t{1} << square;
     } else {
-      hi |= uint64_t{1} << (sq - 64);
+      high |= uint64_t{1} << (square - 64);
     }
   }
 
-  constexpr void clear(Square sq) noexcept {
-    assert(sq >= 0 && sq < BOARD_SQUARES);
-    if (sq < 64) {
-      lo &= ~(uint64_t{1} << sq);
+  constexpr void clear(Square square) noexcept {
+    assert(square >= 0 && square < BOARD_SQUARES);
+    if (square < 64) {
+      low &= ~(uint64_t{1} << square);
     } else {
-      hi &= ~(uint64_t{1} << (sq - 64));
+      high &= ~(uint64_t{1} << (square - 64));
     }
   }
 
-  [[nodiscard]] constexpr bool test(Square sq) const noexcept {
-    assert(sq >= 0 && sq < BOARD_SQUARES);
-    if (sq < 64) {
-      return (lo & (uint64_t{1} << sq)) != 0;
+  [[nodiscard]] constexpr bool test(Square square) const noexcept {
+    assert(square >= 0 && square < BOARD_SQUARES);
+    if (square < 64) {
+      return (low & (uint64_t{1} << square)) != 0;
     }
-    return (hi & (uint64_t{1} << (sq - 64))) != 0;
+    return (high & (uint64_t{1} << (square - 64))) != 0;
   }
 
   [[nodiscard]] constexpr bool empty() const noexcept {
-    return lo == 0 && hi == 0;
+    return low == 0 && high == 0;
   }
 
   [[nodiscard]] constexpr int count() const noexcept {
-    return std::popcount(lo) + std::popcount(hi);
+    return std::popcount(low) + std::popcount(high);
   }
 
   constexpr BitBoard& operator|=(BitBoard rhs) noexcept {
-    lo |= rhs.lo;
-    hi |= rhs.hi;
+    low |= rhs.low;
+    high |= rhs.high;
     return *this;
   }
 
   constexpr BitBoard& operator&=(BitBoard rhs) noexcept {
-    lo &= rhs.lo;
-    hi &= rhs.hi;
+    low &= rhs.low;
+    high &= rhs.high;
     return *this;
   }
 
   constexpr BitBoard& operator^=(BitBoard rhs) noexcept {
-    lo ^= rhs.lo;
-    hi ^= rhs.hi;
+    low ^= rhs.low;
+    high ^= rhs.high;
     return *this;
   }
 
   [[nodiscard]] friend constexpr bool operator==(BitBoard lhs, BitBoard rhs) noexcept {
-    return lhs.lo == rhs.lo && lhs.hi == rhs.hi;
+    return lhs.low == rhs.low && lhs.high == rhs.high;
   }
 
   [[nodiscard]] friend constexpr bool operator!=(BitBoard lhs, BitBoard rhs) noexcept {
@@ -80,7 +80,7 @@ struct BitBoard {
   }
 };
 
-inline constexpr BitBoard BOARD_MASK{~uint64_t{0}, BitBoard::HI_USED_MASK};
+inline constexpr BitBoard BOARD_MASK{~uint64_t{0}, BitBoard::HIGH_USED_MASK};
 
 [[nodiscard]] constexpr BitBoard operator|(BitBoard lhs, BitBoard rhs) noexcept {
   lhs |= rhs;
@@ -98,5 +98,5 @@ inline constexpr BitBoard BOARD_MASK{~uint64_t{0}, BitBoard::HI_USED_MASK};
 }
 
 [[nodiscard]] constexpr BitBoard operator~(BitBoard bb) noexcept {
-  return BitBoard{~bb.lo, (~bb.hi) & BitBoard::HI_USED_MASK};
+  return BitBoard{~bb.low, (~bb.high) & BitBoard::HIGH_USED_MASK};
 }

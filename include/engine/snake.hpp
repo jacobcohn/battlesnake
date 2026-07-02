@@ -1,7 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -28,32 +28,5 @@ struct Snake {
     length = 0;
     health = 100;
     alive = false;
-  }
-
-  [[nodiscard]] constexpr bool contains(Square sq) const noexcept {
-    if (sq == INVALID_SQUARE || length == 0) {
-      return false;
-    }
-
-    Square cur = tail;
-    for (uint8_t visited = 0; cur != INVALID_SQUARE && visited < length; ++visited) {
-      if (cur == sq) {
-        return true;
-      }
-      cur = next[static_cast<std::size_t>(cur)];
-    }
-    return false;
-  }
-
-  [[nodiscard]] std::vector<Square> bodySquares() const {
-    std::vector<Square> squares;
-    squares.reserve(length);
-
-    Square cur = tail;
-    for (uint8_t visited = 0; cur != INVALID_SQUARE && visited < length; ++visited) {
-      squares.push_back(cur);
-      cur = next[static_cast<std::size_t>(cur)];
-    }
-    return squares;
   }
 };
