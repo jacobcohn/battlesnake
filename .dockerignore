@@ -2,3 +2,4 @@ build
 .git
 .env
 .DS_Store
+.vscode

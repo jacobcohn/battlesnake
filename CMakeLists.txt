@@ -11,29 +11,6 @@ endif()
 
 find_package(Crow REQUIRED)
 
-add_executable(battlesnake
-  src/main.cpp
-  src/evaluation/evaluate.cpp
-  src/evaluation/flood_fill.cpp
-  src/evaluation/grid.cpp
-  src/evaluation/territory.cpp
-  src/logging.cpp
-  src/minimax.cpp
-  src/play/move.cpp
-  src/parse.cpp
-  src/play/simulate.cpp
-)
+add_executable(battlesnake src/main.cpp)
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
-
-enable_testing()
-
-add_executable(simulate_test
-  tests/simulate_test.cpp
-  tests/test_helpers.cpp
-  src/play/move.cpp
-  src/play/simulate.cpp
-)
-target_include_directories(simulate_test PRIVATE include tests)
-
-add_test(NAME simulate_test COMMAND simulate_test)

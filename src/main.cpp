@@ -1,13 +1,6 @@
-#include <crow.h>
-
 #include <chrono>
 
-#include "logging.h"
-#include "minimax.h"
-#include "play/move.h"
-#include "parse.h"
-
-constexpr std::chrono::milliseconds MOVE_LATENCY_BUDGET{400};
+#include <crow.h>
 
 crow::response get_info() {
   crow::json::wvalue info;
@@ -38,14 +31,8 @@ crow::response move(const crow::request& request) {
     return crow::response{400, "invalid JSON"};
   }
 
-  GameState state = parse_game_state(body);
-
-  MinimaxStats minimax_stats;
-  Move selected_move = choose_minimax_move(state, MOVE_LATENCY_BUDGET, minimax_stats);
-  log_minimax_stats(selected_move, minimax_stats);
-
   crow::json::wvalue response_body;
-  response_body["move"] = std::string(move_to_string(selected_move));
+  response_body["move"] = "up";
 
   crow::response response{response_body.dump()};
   response.set_header("Content-Type", "application/json");
