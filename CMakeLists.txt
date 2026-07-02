@@ -26,6 +26,7 @@ if(BUILD_TESTING)
   add_executable(battlesnake_tests
     tests/test_main.cpp
     tests/engine/test_bitboard.cpp
+    tests/engine/test_move.cpp
     tests/engine/test_position.cpp
     tests/engine/test_snake.cpp
     tests/engine/test_square.cpp
