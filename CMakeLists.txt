@@ -29,9 +29,11 @@ if(BUILD_TESTING)
     tests/engine/test_position.cpp
     tests/engine/test_snake.cpp
     tests/engine/test_square.cpp
+    tests/server/test_parser.cpp
+    src/server/parser.cpp
   )
   target_include_directories(battlesnake_tests PRIVATE include)
-  target_link_libraries(battlesnake_tests PRIVATE doctest::doctest)
+  target_link_libraries(battlesnake_tests PRIVATE doctest::doctest Crow::Crow)
 
   add_test(NAME battlesnake_tests COMMAND battlesnake_tests)
 endif()
