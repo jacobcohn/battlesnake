@@ -31,7 +31,6 @@ TEST_CASE("Position reset clears all state") {
   position.turn = 17;
   position.occupied.set(idx(1, 1));
   position.food.set(idx(5, 5));
-  position.hazards.set(idx(10, 10));
   position.exact_hash = 123;
   position.space_hash = 456;
 
@@ -42,7 +41,6 @@ TEST_CASE("Position reset clears all state") {
   CHECK(position.turn == 0);
   CHECK(position.occupied.empty());
   CHECK(position.food.empty());
-  CHECK(position.hazards.empty());
   CHECK(position.exact_hash == 0);
   CHECK(position.space_hash == 0);
 
@@ -65,13 +63,11 @@ TEST_CASE("Position clear_bitboards clears only board masks") {
   position.space_hash = 222;
   position.occupied.set(idx(0, 0));
   position.food.set(idx(1, 1));
-  position.hazards.set(idx(2, 2));
 
   position.clear_bitboards();
 
   CHECK(position.occupied.empty());
   CHECK(position.food.empty());
-  CHECK(position.hazards.empty());
   CHECK(position.snake_count == 1);
   CHECK(position.you == 0);
   CHECK(position.turn == 12);

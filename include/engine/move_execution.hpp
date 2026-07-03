@@ -14,7 +14,12 @@ struct Undo {
 
   BitBoard occupied;
   BitBoard food;
-  BitBoard hazards;
+
+  std::array<bool, MAX_SNAKES> alive_at_start{};
+  std::array<Square, MAX_SNAKES> old_tails{};
+  std::array<Square, MAX_SNAKES> new_heads{};
+  std::array<bool, MAX_SNAKES> ate_food{};
+  std::array<bool, MAX_SNAKES> dies{};
 
   uint8_t snake_count = 0;
   uint8_t you = 0;

@@ -14,7 +14,6 @@ struct Position {
 
   BitBoard occupied;
   BitBoard food;
-  BitBoard hazards;
 
   uint8_t snake_count = 0;
   uint8_t you = 0;
@@ -41,7 +40,6 @@ struct Position {
   constexpr void clear_bitboards() noexcept {
     occupied = BitBoard{};
     food = BitBoard{};
-    hazards = BitBoard{};
   }
 
   constexpr void rebuild_occupied() noexcept {

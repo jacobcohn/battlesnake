@@ -155,11 +155,6 @@ Position parse_position(const crow::json::rvalue& body) {
     position.food.set(parse_coord(food[i]));
   }
 
-  const crow::json::rvalue& hazards = require_list_field(board, "hazards");
-  for (std::size_t i = 0; i < hazards.size(); ++i) {
-    position.hazards.set(parse_coord(hazards[i]));
-  }
-
   const std::string you_id = require_string_field(you, "id");
 
   const crow::json::rvalue& snakes = require_list_field(board, "snakes");
