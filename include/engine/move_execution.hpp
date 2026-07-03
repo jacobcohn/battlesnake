@@ -24,4 +24,5 @@ struct Undo {
   uint64_t space_hash = 0;
 };
 
+void make_move(Position& position, const JointMove& joint, Undo& undo) noexcept;
 void unmake_move(Position& position, const Undo& undo) noexcept;
