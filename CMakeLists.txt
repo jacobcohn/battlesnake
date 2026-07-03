@@ -13,7 +13,10 @@ find_package(Crow REQUIRED)
 
 add_executable(battlesnake
   src/main.cpp
-  src/engine/move_execution.cpp
+  src/engine/move/apply.cpp
+  src/engine/move/collisions.cpp
+  src/engine/move/execution.cpp
+  src/engine/move/undo.cpp
   src/server/parser.cpp
 )
 target_include_directories(battlesnake PRIVATE include)
@@ -33,7 +36,10 @@ if(BUILD_TESTING)
     tests/engine/test_snake.cpp
     tests/engine/test_square.cpp
     tests/server/test_parser.cpp
-    src/engine/move_execution.cpp
+    src/engine/move/apply.cpp
+    src/engine/move/collisions.cpp
+    src/engine/move/execution.cpp
+    src/engine/move/undo.cpp
     src/server/parser.cpp
   )
   target_include_directories(battlesnake_tests PRIVATE include)

@@ -15,6 +15,15 @@ struct Undo {
   std::array<uint8_t, MAX_SNAKES> old_health{};
   std::array<bool, MAX_SNAKES> ate_food{};
   std::array<bool, MAX_SNAKES> died{};
+
+  constexpr Undo() noexcept {
+    old_heads.fill(INVALID_SQUARE);
+    old_tails.fill(INVALID_SQUARE);
+    new_heads.fill(INVALID_SQUARE);
+    old_health.fill(0);
+    ate_food.fill(false);
+    died.fill(false);
+  }
 };
 
 [[nodiscard]] Undo make_move(Position& position, const JointMove& joint) noexcept;
