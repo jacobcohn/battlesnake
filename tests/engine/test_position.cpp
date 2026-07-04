@@ -16,6 +16,9 @@ void make_three_segment_snake(Snake& snake, Square tail, Square middle, Square h
   snake.length = 3;
   snake.health = 90;
   snake.alive = true;
+  snake.occupied.set(tail);
+  snake.occupied.set(middle);
+  snake.occupied.set(head);
   snake.next[static_cast<std::size_t>(tail)] = middle;
   snake.next[static_cast<std::size_t>(middle)] = head;
 }
@@ -50,6 +53,7 @@ TEST_CASE("Position reset clears all state") {
     CHECK(snake.length == 0);
     CHECK(snake.health == 100);
     CHECK_FALSE(snake.alive);
+    CHECK(snake.occupied.empty());
   }
 }
 
@@ -75,17 +79,16 @@ TEST_CASE("Position clear_bitboards clears only board masks") {
   CHECK(position.space_hash == 222);
 }
 
-TEST_CASE("Position rebuild_occupied handles no snakes") {
+TEST_CASE("Position build_occupied handles no snakes") {
   Position position;
   position.reset();
   position.occupied.set(idx(3, 3));
-
-  position.rebuild_occupied();
+  position.build_occupied();
 
   CHECK(position.occupied.empty());
 }
 
-TEST_CASE("Position rebuild_occupied marks every square in one alive snake") {
+TEST_CASE("Position build_occupied marks every square in one alive snake") {
   Position position;
   position.reset();
 
@@ -94,8 +97,7 @@ TEST_CASE("Position rebuild_occupied marks every square in one alive snake") {
   const Square head = idx(4, 4);
   make_three_segment_snake(position.snakes[0], tail, middle, head);
   position.snake_count = 1;
-
-  position.rebuild_occupied();
+  position.build_occupied();
 
   CHECK(position.occupied.count() == 3);
   CHECK(position.occupied.test(tail));
@@ -104,7 +106,7 @@ TEST_CASE("Position rebuild_occupied marks every square in one alive snake") {
   CHECK_FALSE(position.occupied.test(idx(0, 0)));
 }
 
-TEST_CASE("Position rebuild_occupied ignores dead and zero-length snakes") {
+TEST_CASE("Position build_occupied ignores dead and zero-length snakes") {
   Position position;
   position.reset();
 
@@ -115,13 +117,12 @@ TEST_CASE("Position rebuild_occupied ignores dead and zero-length snakes") {
   position.snakes[1].length = 0;
 
   position.snake_count = 2;
-
-  position.rebuild_occupied();
+  position.build_occupied();
 
   CHECK(position.occupied.empty());
 }
 
-TEST_CASE("Position rebuild_occupied combines multiple alive snakes") {
+TEST_CASE("Position build_occupied combines multiple alive snakes") {
   Position position;
   position.reset();
 
@@ -136,8 +137,7 @@ TEST_CASE("Position rebuild_occupied combines multiple alive snakes") {
   make_three_segment_snake(position.snakes[1], second_tail, second_middle, second_head);
 
   position.snake_count = 2;
-
-  position.rebuild_occupied();
+  position.build_occupied();
 
   CHECK(position.occupied.count() == 6);
   CHECK(position.occupied.test(first_tail));

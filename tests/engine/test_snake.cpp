@@ -14,6 +14,7 @@ void check_snake_is_reset(const Snake& snake) {
   CHECK(static_cast<int>(snake.length) == 0);
   CHECK(static_cast<int>(snake.health) == 100);
   CHECK_FALSE(snake.alive);
+  CHECK(snake.occupied.empty());
 
   for (std::size_t i = 0; i < snake.next.size(); ++i) {
     CAPTURE(i);
@@ -37,6 +38,9 @@ TEST_CASE("Snake reset clears all mutable state") {
   snake.length = 3;
   snake.health = 42;
   snake.alive = true;
+  snake.occupied.set(idx(5, 5));
+  snake.occupied.set(idx(5, 4));
+  snake.occupied.set(idx(5, 3));
   snake.next[static_cast<std::size_t>(idx(5, 3))] = idx(5, 4);
   snake.next[static_cast<std::size_t>(idx(5, 4))] = idx(5, 5);
   snake.next[static_cast<std::size_t>(idx(0, 0))] = idx(1, 0);

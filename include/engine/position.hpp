@@ -42,21 +42,14 @@ struct Position {
     food = BitBoard{};
   }
 
-  constexpr void rebuild_occupied() noexcept {
+  constexpr void build_occupied() noexcept {
     assert(snake_count <= MAX_SNAKES);
     occupied = BitBoard{};
 
     for (int i = 0; i < snake_count; ++i) {
       const Snake& snake = snakes[static_cast<std::size_t>(i)];
-
-      if (!snake.alive || snake.length == 0) {
-        continue;
-      }
-
-      Square cur = snake.tail;
-      for (int visited = 0; cur != INVALID_SQUARE && visited < snake.length; ++visited) {
-        occupied.set(cur);
-        cur = snake.next[static_cast<std::size_t>(cur)];
+      if (snake.alive && snake.length > 0) {
+        occupied |= snake.occupied;
       }
     }
   }

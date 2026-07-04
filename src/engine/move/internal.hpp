@@ -14,7 +14,6 @@ void mark_health_deaths(Position& position, Undo& undo) noexcept;
 void mark_body_collisions(const Position& position, Undo& undo) noexcept;
 void mark_head_to_head_deaths(const Position& position, Undo& undo) noexcept;
 void remove_dead_snakes(Position& position, const Undo& undo) noexcept;
+void build_alive_occupied(Position& position) noexcept;
 
-void restore_survivor_occupied(Position& position, const Undo& undo) noexcept;
 void restore_snakes(Position& position, const Undo& undo) noexcept;
-void restore_dead_occupied(Position& position, const Undo& undo) noexcept;

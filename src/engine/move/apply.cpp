@@ -15,11 +15,12 @@ bool has_new_head_on_square(const Position& position, const Undo& undo, Square s
   return false;
 }
 
-void remove_tail(Position& position, Snake& snake, bool clear_occupied) noexcept {
+void remove_tail(Position& position, Snake& snake, bool clear_position_occupied) noexcept {
   const Square old_tail = snake.tail;
   snake.tail = snake.next[static_cast<std::size_t>(old_tail)];
   snake.next[static_cast<std::size_t>(old_tail)] = INVALID_SQUARE;
-  if (clear_occupied) {
+  snake.occupied.clear(old_tail);
+  if (clear_position_occupied) {
     position.occupied.clear(old_tail);
   }
 }
@@ -47,6 +48,8 @@ void compute_move_targets(const Position& position, const JointMove& joint, Undo
     if (undo.old_heads[index] != INVALID_SQUARE) {
       undo.new_heads[index] = move_target(position.snakes[index].head, joint.moves[index]);
       undo.ate_food[index] = undo.new_heads[index] != INVALID_SQUARE && position.food.test(undo.new_heads[index]);
+      undo.new_head_was_own_body[index] = undo.new_heads[index] != INVALID_SQUARE &&
+                                           position.snakes[index].occupied.test(undo.new_heads[index]);
     }
   }
 }
@@ -68,6 +71,7 @@ void move_heads(Position& position, Undo& undo) noexcept {
 
     snake.next[static_cast<std::size_t>(snake.head)] = new_head;
     snake.head = new_head;
+    snake.occupied.set(new_head);
     position.occupied.set(new_head);
   }
 }

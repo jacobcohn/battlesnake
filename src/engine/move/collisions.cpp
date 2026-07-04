@@ -54,37 +54,10 @@ bool hits_body_after_tail_updates(const Position& position, const Undo& undo, Sq
   return square_was_occupied_at_start(position, undo, square) && !is_vacated_tail(position, undo, square);
 }
 
-bool square_is_in_surviving_snake(const Position& position, const Undo& undo, Square square) noexcept {
-  for (int i = 0; i < position.snake_count; ++i) {
-    const std::size_t index = static_cast<std::size_t>(i);
-    if (undo.old_heads[index] == INVALID_SQUARE || undo.died[index]) {
-      continue;
-    }
-
-    const Snake& snake = position.snakes[index];
-    Square current = snake.tail;
-    for (int visited = 0; current != INVALID_SQUARE && visited < snake.length; ++visited) {
-      if (current == square) {
-        return true;
-      }
-      current = snake.next[static_cast<std::size_t>(current)];
-    }
-  }
-
-  return false;
 }
 
-void clear_snake_from_occupied(Position& position, const Undo& undo, const Snake& snake) noexcept {
-  Square current = snake.tail;
-  for (int visited = 0; current != INVALID_SQUARE && visited < snake.length; ++visited) {
-    const Square next = snake.next[static_cast<std::size_t>(current)];
-    if (!square_is_in_surviving_snake(position, undo, current)) {
-      position.occupied.clear(current);
-    }
-    current = next;
-  }
-}
-
+void build_alive_occupied(Position& position) noexcept {
+  position.build_occupied();
 }
 
 void mark_health_deaths(Position& position, Undo& undo) noexcept {
@@ -135,13 +108,18 @@ void mark_head_to_head_deaths(const Position& position, Undo& undo) noexcept {
 }
 
 void remove_dead_snakes(Position& position, const Undo& undo) noexcept {
+  bool removed_any = false;
   for (int i = 0; i < position.snake_count; ++i) {
     const std::size_t index = static_cast<std::size_t>(i);
     Snake& snake = position.snakes[index];
 
     if (undo.old_heads[index] != INVALID_SQUARE && undo.died[index]) {
-      clear_snake_from_occupied(position, undo, snake);
       snake.alive = false;
+      removed_any = true;
     }
+  }
+
+  if (removed_any) {
+    build_alive_occupied(position);
   }
 }

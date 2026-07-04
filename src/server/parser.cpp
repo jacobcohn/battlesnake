@@ -110,6 +110,7 @@ std::string parse_snake(const crow::json::rvalue& value, Snake& snake) {
 
     seen.set(square);
     squares.push_back(square);
+    snake.occupied.set(square);
   }
 
   snake.head = squares.front();
@@ -182,6 +183,6 @@ Position parse_position(const crow::json::rvalue& body) {
     throw std::runtime_error("missing own snake id");
   }
 
-  position.rebuild_occupied();
+  position.build_occupied();
   return position;
 }

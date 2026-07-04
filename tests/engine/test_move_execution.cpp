@@ -24,6 +24,10 @@ void set_snake(Snake& snake, std::initializer_list<Square> head_to_tail, uint8_t
   snake.health = health;
   snake.alive = true;
 
+  for (std::size_t i = 0; i < count; ++i) {
+    snake.occupied.set(squares[i]);
+  }
+
   for (std::size_t i = count - 1; i > 0; --i) {
     snake.next[static_cast<std::size_t>(squares[i])] = squares[i - 1];
   }
@@ -31,7 +35,7 @@ void set_snake(Snake& snake, std::initializer_list<Square> head_to_tail, uint8_t
 
 void init_occupied(Position& position) {
   position.occupied = BitBoard{};
-  position.rebuild_occupied();
+  position.build_occupied();
 }
 
 Position one_snake_position(std::initializer_list<Square> head_to_tail, uint8_t health = 100) {
@@ -82,6 +86,7 @@ void check_unmake_restores(Position& position, const Position& before, const Und
     CHECK(actual.health == expected.health);
     CHECK(actual.alive == expected.alive);
     CHECK(actual.next == expected.next);
+    CHECK(actual.occupied == expected.occupied);
   }
 }
 
@@ -99,6 +104,9 @@ TEST_CASE("make_move updates head tail body health occupied and undo restores") 
   CHECK(snake.length == 3);
   CHECK(snake.health == 89);
   check_body(snake, {idx(5, 4), idx(5, 5), idx(5, 6)});
+  CHECK_FALSE(snake.occupied.test(idx(5, 3)));
+  CHECK(snake.occupied.test(idx(5, 6)));
+  CHECK(snake.occupied.count() == 3);
   CHECK_FALSE(position.occupied.test(idx(5, 3)));
   CHECK(position.occupied.test(idx(5, 4)));
   CHECK(position.occupied.test(idx(5, 5)));
@@ -121,6 +129,8 @@ TEST_CASE("food grows snake resets health removes food and keeps tail occupied")
   CHECK(snake.health == 100);
   CHECK_FALSE(position.food.test(idx(5, 6)));
   check_body(snake, {idx(5, 3), idx(5, 4), idx(5, 5), idx(5, 6)});
+  CHECK(snake.occupied.count() == 4);
+  CHECK(snake.occupied.test(idx(5, 3)));
   CHECK(position.occupied.count() == 4);
   CHECK(position.occupied.test(idx(5, 3)));
 
@@ -135,6 +145,7 @@ TEST_CASE("snake dies by starvation and occupied body is removed") {
 
   CHECK_FALSE(position.snakes[0].alive);
   CHECK(position.snakes[0].length == 3);
+  CHECK(position.snakes[0].occupied.count() == 3);
   CHECK(position.occupied.empty());
 
   check_unmake_restores(position, before, undo);
@@ -147,6 +158,7 @@ TEST_CASE("snake dies out of bounds and occupied body is removed") {
   Undo undo = make_move(position, moves(Move::Left));
 
   CHECK_FALSE(position.snakes[0].alive);
+  CHECK(position.snakes[0].occupied.count() == 1);
   CHECK(position.occupied.empty());
 
   check_unmake_restores(position, before, undo);

@@ -19,8 +19,7 @@ Undo make_move(Position& position, const JointMove& joint) noexcept {
 }
 
 void unmake_move(Position& position, const Undo& undo) noexcept {
-  restore_survivor_occupied(position, undo);
   restore_snakes(position, undo);
-  restore_dead_occupied(position, undo);
+  build_alive_occupied(position);
   --position.turn;
 }

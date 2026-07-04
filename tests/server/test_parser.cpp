@@ -104,9 +104,13 @@ TEST_CASE("parse_position parses snake body linked from tail to head") {
   CHECK(snake.next[static_cast<std::size_t>(tail)] == middle);
   CHECK(snake.next[static_cast<std::size_t>(middle)] == head);
   CHECK(snake.next[static_cast<std::size_t>(head)] == INVALID_SQUARE);
+  CHECK(snake.occupied.count() == 3);
+  CHECK(snake.occupied.test(head));
+  CHECK(snake.occupied.test(middle));
+  CHECK(snake.occupied.test(tail));
 }
 
-TEST_CASE("parse_position rebuilds occupied squares") {
+TEST_CASE("parse_position builds occupied squares") {
   const Position position = parse_json(valid_payload());
 
   CHECK(position.occupied.count() == 6);
