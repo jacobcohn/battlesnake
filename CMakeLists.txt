@@ -34,13 +34,13 @@ if(BUILD_TESTING)
 
   add_executable(battlesnake_tests
     tests/test_main.cpp
-    tests/engine/test_bitboard.cpp
-    tests/engine/test_move.cpp
-    tests/engine/test_move_execution.cpp
-    tests/engine/test_position.cpp
-    tests/engine/test_snake.cpp
-    tests/engine/test_square.cpp
-    tests/engine/test_territory.cpp
+    tests/engine/core/test_bitboard.cpp
+    tests/engine/core/test_move.cpp
+    tests/engine/core/test_position.cpp
+    tests/engine/core/test_snake.cpp
+    tests/engine/core/test_square.cpp
+    tests/engine/evaluation/territory/test_territory.cpp
+    tests/engine/move/test_execution.cpp
     tests/server/test_parser.cpp
     src/engine/evaluation/territory/territory.cpp
     src/engine/evaluation/territory/adjacency.cpp
