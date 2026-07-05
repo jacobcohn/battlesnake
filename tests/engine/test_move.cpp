@@ -3,7 +3,7 @@
 #include <doctest/doctest.h>
 
 #include "engine/constants.hpp"
-#include "engine/move.hpp"
+#include "engine/move/move.hpp"
 #include "engine/square.hpp"
 
 TEST_CASE("Move is compact") {

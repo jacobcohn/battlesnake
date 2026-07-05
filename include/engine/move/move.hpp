@@ -5,8 +5,8 @@
 #include <cstddef>
 #include <cstdint>
 
-#include "constants.hpp"
-#include "square.hpp"
+#include "engine/constants.hpp"
+#include "engine/square.hpp"
 
 enum class Move : uint8_t {
   Up,

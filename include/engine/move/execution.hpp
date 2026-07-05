@@ -3,10 +3,10 @@
 #include <array>
 #include <cstdint>
 
-#include "constants.hpp"
-#include "move.hpp"
-#include "position.hpp"
-#include "square.hpp"
+#include "engine/constants.hpp"
+#include "engine/move/move.hpp"
+#include "engine/position.hpp"
+#include "engine/square.hpp"
 
 struct Undo {
   std::array<Square, MAX_SNAKES> old_heads{};

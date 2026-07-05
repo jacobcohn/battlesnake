@@ -3,7 +3,7 @@
 
 #include <doctest/doctest.h>
 
-#include "engine/move_execution.hpp"
+#include "engine/move/execution.hpp"
 #include "engine/square.hpp"
 
 namespace {
