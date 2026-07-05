@@ -3,6 +3,9 @@
 #include <array>
 
 #include "engine/core/constants.hpp"
+#include "engine/core/position.hpp"
+#include "engine/evaluation/territory/frontiers.hpp"
+#include "engine/evaluation/territory/territory.hpp"
 
 namespace engine::evaluation {
 
@@ -14,5 +17,19 @@ struct TerritoryClaims {
 
   TerritoryClaims() noexcept;
 };
+
+[[nodiscard]] TerritoryClaims initialize_claims() noexcept;
+
+void record_arrivals(
+    const Position& position,
+    TerritoryFrontiers& frontiers,
+    TerritoryClaims& claims,
+    int turn
+) noexcept;
+
+[[nodiscard]] TerritoryControl count_control(
+    const Position& position,
+    const TerritoryClaims& claims
+) noexcept;
 
 }
