@@ -4,7 +4,7 @@
 #include <doctest/doctest.h>
 
 #include "engine/move/execution.hpp"
-#include "engine/square.hpp"
+#include "engine/core/square.hpp"
 
 namespace {
 

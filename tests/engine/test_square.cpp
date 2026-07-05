@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
 
-#include "engine/constants.hpp"
-#include "engine/square.hpp"
+#include "engine/core/constants.hpp"
+#include "engine/core/square.hpp"
 
 TEST_CASE("square constants match board assumptions") {
   CHECK(BOARD_WIDTH == 11);

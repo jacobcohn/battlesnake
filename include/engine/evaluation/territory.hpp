@@ -2,8 +2,8 @@
 
 #include <array>
 
-#include "engine/constants.hpp"
-#include "engine/position.hpp"
+#include "engine/core/constants.hpp"
+#include "engine/core/position.hpp"
 
 namespace engine::evaluation {
 

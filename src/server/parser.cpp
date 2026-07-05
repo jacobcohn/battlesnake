@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "engine/bitboard.hpp"
-#include "engine/constants.hpp"
-#include "engine/square.hpp"
+#include "engine/core/bitboard.hpp"
+#include "engine/core/constants.hpp"
+#include "engine/core/square.hpp"
 
 namespace {
 

@@ -3,21 +3,10 @@
 #include <array>
 #include <cassert>
 #include <cstddef>
-#include <cstdint>
 
-#include "engine/constants.hpp"
-#include "engine/square.hpp"
-
-enum class Move : uint8_t {
-  Up,
-  Down,
-  Left,
-  Right,
-};
-
-struct JointMove {
-  std::array<Move, MAX_SNAKES> moves{};
-};
+#include "engine/core/constants.hpp"
+#include "engine/core/move.hpp"
+#include "engine/core/square.hpp"
 
 namespace move_internal {
 

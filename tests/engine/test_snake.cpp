@@ -2,9 +2,9 @@
 
 #include <doctest/doctest.h>
 
-#include "engine/constants.hpp"
-#include "engine/snake.hpp"
-#include "engine/square.hpp"
+#include "engine/core/constants.hpp"
+#include "engine/core/snake.hpp"
+#include "engine/core/square.hpp"
 
 namespace {
 

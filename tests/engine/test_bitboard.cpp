@@ -2,9 +2,9 @@
 
 #include <doctest/doctest.h>
 
-#include "engine/bitboard.hpp"
-#include "engine/constants.hpp"
-#include "engine/square.hpp"
+#include "engine/core/bitboard.hpp"
+#include "engine/core/constants.hpp"
+#include "engine/core/square.hpp"
 
 TEST_CASE("BitBoard starts empty") {
   const BitBoard board;

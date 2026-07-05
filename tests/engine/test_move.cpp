@@ -2,9 +2,10 @@
 
 #include <doctest/doctest.h>
 
-#include "engine/constants.hpp"
-#include "engine/move/move.hpp"
-#include "engine/square.hpp"
+#include "engine/core/constants.hpp"
+#include "engine/core/move.hpp"
+#include "engine/core/square.hpp"
+#include "engine/move/targets.hpp"
 
 TEST_CASE("Move is compact") {
   CHECK(sizeof(Move) == 1);
