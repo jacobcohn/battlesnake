@@ -8,7 +8,14 @@ namespace engine::evaluation {
 
 namespace {
 
-using AvailableTurns = std::array<int, BOARD_SQUARES>;
+struct TerritoryAvailability {
+  BitBoard available = BOARD_MASK;
+  std::array<Square, MAX_SNAKES> next_release_square{};
+
+  TerritoryAvailability() noexcept {
+    next_release_square.fill(INVALID_SQUARE);
+  }
+};
 
 struct TerritoryFrontiers {
   std::array<BitBoard, MAX_SNAKES> current{};
@@ -16,10 +23,11 @@ struct TerritoryFrontiers {
   std::array<BitBoard, MAX_SNAKES> reached{};
 };
 
-[[nodiscard]] AvailableTurns build_available_turns(const Position& position) noexcept {
+[[nodiscard]] TerritoryAvailability initialize_availability(const Position& position) noexcept {
   assert(position.snake_count <= MAX_SNAKES);
 
-  AvailableTurns available_turns{};
+  TerritoryAvailability availability{};
+  availability.available &= ~position.occupied;
 
   for (int snake_index = 0; snake_index < position.snake_count; ++snake_index) {
     const Snake& snake = position.snakes[static_cast<std::size_t>(snake_index)];
@@ -27,25 +35,41 @@ struct TerritoryFrontiers {
       continue;
     }
 
-    Square square = snake.tail;
-    for (int release_turn = 1; release_turn <= snake.length; ++release_turn) {
-      assert(square >= 0 && square < BOARD_SQUARES);
-      if (square < 0 || square >= BOARD_SQUARES) {
-        break;
-      }
-
-      if (release_turn > available_turns[static_cast<std::size_t>(square)]) {
-        available_turns[static_cast<std::size_t>(square)] = release_turn;
-      }
-
-      if (square == snake.head) {
-        break;
-      }
-      square = snake.next[static_cast<std::size_t>(square)];
-    }
+    availability.next_release_square[static_cast<std::size_t>(snake_index)] = snake.tail;
   }
 
-  return available_turns;
+  return availability;
+}
+
+void release_body_squares(const Position& position, TerritoryAvailability& availability) noexcept {
+  assert(position.snake_count <= MAX_SNAKES);
+
+  for (int snake_index = 0; snake_index < position.snake_count; ++snake_index) {
+    const Snake& snake = position.snakes[static_cast<std::size_t>(snake_index)];
+    if (!snake.alive || snake.length == 0) {
+      continue;
+    }
+
+    Square& next_release_square = availability.next_release_square[static_cast<std::size_t>(snake_index)];
+    if (next_release_square == INVALID_SQUARE) {
+      continue;
+    }
+
+    assert(next_release_square >= 0 && next_release_square < BOARD_SQUARES);
+    if (next_release_square < 0 || next_release_square >= BOARD_SQUARES) {
+      next_release_square = INVALID_SQUARE;
+      continue;
+    }
+
+    const Square released_square = next_release_square;
+    availability.available.set(released_square);
+
+    if (released_square == snake.head) {
+      next_release_square = INVALID_SQUARE;
+    } else {
+      next_release_square = snake.next[static_cast<std::size_t>(released_square)];
+    }
+  }
 }
 
 [[nodiscard]] TerritoryFrontiers initialize_frontiers(const Position& position) noexcept {
@@ -73,12 +97,14 @@ struct TerritoryFrontiers {
 }
 
 TerritoryControl compute_territory_control(const Position& position) noexcept {
-  const AvailableTurns available_turns = build_available_turns(position);
+  TerritoryAvailability availability = initialize_availability(position);
   TerritoryFrontiers frontiers = initialize_frontiers(position);
 
   // Heads are movement sources at turn 0, but they are not territory yet.
   // reached remains empty until a snake legally arrives on a later turn.
-  (void)available_turns;
+  release_body_squares(position, availability);
+
+  (void)availability;
   (void)frontiers;
   return {};
 }
