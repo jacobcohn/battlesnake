@@ -13,6 +13,7 @@ find_package(Crow REQUIRED)
 
 add_executable(battlesnake
   src/main.cpp
+  src/engine/evaluation/evaluation.cpp
   src/engine/evaluation/territory/territory.cpp
   src/engine/evaluation/territory/adjacency.cpp
   src/engine/evaluation/territory/availability.cpp
@@ -39,9 +40,11 @@ if(BUILD_TESTING)
     tests/engine/core/test_position.cpp
     tests/engine/core/test_snake.cpp
     tests/engine/core/test_square.cpp
+    tests/engine/evaluation/test_evaluation.cpp
     tests/engine/evaluation/territory/test_territory.cpp
     tests/engine/move/test_execution.cpp
     tests/server/test_parser.cpp
+    src/engine/evaluation/evaluation.cpp
     src/engine/evaluation/territory/territory.cpp
     src/engine/evaluation/territory/adjacency.cpp
     src/engine/evaluation/territory/availability.cpp
