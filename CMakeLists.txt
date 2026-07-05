@@ -40,6 +40,7 @@ if(BUILD_TESTING)
     tests/engine/test_position.cpp
     tests/engine/test_snake.cpp
     tests/engine/test_square.cpp
+    tests/engine/test_territory.cpp
     tests/server/test_parser.cpp
     src/engine/evaluation/territory/territory.cpp
     src/engine/evaluation/territory/adjacency.cpp
