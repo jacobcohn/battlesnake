@@ -24,6 +24,12 @@ add_executable(battlesnake
   src/engine/move/execution.cpp
   src/engine/move/generation.cpp
   src/engine/move/undo.cpp
+  src/engine/search/context.cpp
+  src/engine/search/fallback.cpp
+  src/engine/search/minimax.cpp
+  src/engine/search/root.cpp
+  src/engine/search/search.cpp
+  src/engine/search/terminal.cpp
   src/server/parser.cpp
 )
 target_include_directories(battlesnake PRIVATE include)
@@ -45,6 +51,7 @@ if(BUILD_TESTING)
     tests/engine/evaluation/territory/test_territory.cpp
     tests/engine/move/test_execution.cpp
     tests/engine/move/test_generation.cpp
+    tests/engine/search/test_search.cpp
     tests/server/test_parser.cpp
     src/engine/evaluation/evaluation.cpp
     src/engine/evaluation/territory/territory.cpp
@@ -57,6 +64,12 @@ if(BUILD_TESTING)
     src/engine/move/execution.cpp
     src/engine/move/generation.cpp
     src/engine/move/undo.cpp
+    src/engine/search/context.cpp
+    src/engine/search/fallback.cpp
+    src/engine/search/minimax.cpp
+    src/engine/search/root.cpp
+    src/engine/search/search.cpp
+    src/engine/search/terminal.cpp
     src/server/parser.cpp
   )
   target_include_directories(battlesnake_tests PRIVATE include)
