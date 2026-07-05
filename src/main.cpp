@@ -1,9 +1,18 @@
-#include <chrono>
+#include <cstddef>
 #include <exception>
 
 #include <crow.h>
 
+#include "engine/core/move.hpp"
+#include "engine/search/search.hpp"
 #include "server/parser.hpp"
+
+namespace {
+
+constexpr int SEARCH_MAX_DEPTH = 100;
+constexpr int SEARCH_TIME_LIMIT_MS = 400;
+
+}
 
 crow::response get_info() {
   crow::json::wvalue info;
@@ -35,11 +44,17 @@ crow::response move(const crow::request& request) {
   }
 
   try {
-    [[maybe_unused]] Position position = parse_position(body);
+    Position position = parse_position(body);
 
-    // TODO: call engine/search move selection
+    engine::search::SearchLimits limits;
+    limits.max_depth = SEARCH_MAX_DEPTH;
+    limits.time_limit_ms = SEARCH_TIME_LIMIT_MS;
+
+    const engine::search::SearchResult result = engine::search::search(position, limits);
+    const char* selected_move = move_name(result.best_move.moves[static_cast<std::size_t>(position.you)]);
+
     crow::json::wvalue response_body;
-    response_body["move"] = "up";
+    response_body["move"] = selected_move;
 
     crow::response response{response_body.dump()};
     response.set_header("Content-Type", "application/json");
