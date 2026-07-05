@@ -6,19 +6,35 @@
 
 namespace engine::evaluation {
 
+namespace {
+
+constexpr int MAX_TERRITORY_TURNS = BOARD_SQUARES * 2;
+
+}
+
 TerritoryControl compute_territory_control(const Position& position) noexcept {
   TerritoryAvailability availability = initialize_availability(position);
   TerritoryFrontiers frontiers = initialize_frontiers(position);
-  TerritoryClaims claims{};
+  TerritoryClaims claims = initialize_claims();
 
-  // Heads are movement sources at turn 0, but they are not territory yet.
-  // reached remains empty until a snake legally arrives on a later turn.
-  release_body_squares(position, availability);
+  for (int turn = 1; turn <= MAX_TERRITORY_TURNS; ++turn) {
+    release_body_squares(position, availability);
+    expand_frontiers(position, availability, frontiers);
 
-  (void)availability;
-  (void)frontiers;
-  (void)claims;
-  return {};
+    if (next_frontiers_empty(position, frontiers)) {
+      break;
+    }
+
+    record_arrivals(position, frontiers, claims, turn);
+
+    if (all_squares_resolved(claims)) {
+      break;
+    }
+
+    advance_frontiers(frontiers);
+  }
+
+  return count_control(position, claims);
 }
 
 }

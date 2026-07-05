@@ -90,6 +90,16 @@ void record_arrivals(
   }
 }
 
+bool all_squares_resolved(const TerritoryClaims& claims) noexcept {
+  for (Square square = 0; square < BOARD_SQUARES; ++square) {
+    if (claims.turn[static_cast<std::size_t>(square)] == UNREACHED_TURN) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 TerritoryControl count_control(
     const Position& position,
     const TerritoryClaims& claims

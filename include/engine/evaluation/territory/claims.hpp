@@ -27,6 +27,8 @@ void record_arrivals(
     int turn
 ) noexcept;
 
+[[nodiscard]] bool all_squares_resolved(const TerritoryClaims& claims) noexcept;
+
 [[nodiscard]] TerritoryControl count_control(
     const Position& position,
     const TerritoryClaims& claims

@@ -17,4 +17,17 @@ struct TerritoryFrontiers {
 
 [[nodiscard]] TerritoryFrontiers initialize_frontiers(const Position& position) noexcept;
 
+void expand_frontiers(
+    const Position& position,
+    const TerritoryAvailability& availability,
+    TerritoryFrontiers& frontiers
+) noexcept;
+
+[[nodiscard]] bool next_frontiers_empty(
+    const Position& position,
+    const TerritoryFrontiers& frontiers
+) noexcept;
+
+void advance_frontiers(TerritoryFrontiers& frontiers) noexcept;
+
 }
