@@ -23,6 +23,20 @@ struct TerritoryFrontiers {
   std::array<BitBoard, MAX_SNAKES> reached{};
 };
 
+struct TerritoryClaims {
+  std::array<int, BOARD_SQUARES> snake{};
+  std::array<int, BOARD_SQUARES> turn{};
+  std::array<int, BOARD_SQUARES> length{};
+  std::array<bool, BOARD_SQUARES> contested{};
+
+  TerritoryClaims() noexcept {
+    snake.fill(-1);
+    turn.fill(BOARD_SQUARES * 2 + 1);
+    length.fill(0);
+    contested.fill(false);
+  }
+};
+
 [[nodiscard]] TerritoryAvailability initialize_availability(const Position& position) noexcept {
   assert(position.snake_count <= MAX_SNAKES);
 
@@ -99,6 +113,7 @@ void release_body_squares(const Position& position, TerritoryAvailability& avail
 TerritoryControl compute_territory_control(const Position& position) noexcept {
   TerritoryAvailability availability = initialize_availability(position);
   TerritoryFrontiers frontiers = initialize_frontiers(position);
+  TerritoryClaims claims{};
 
   // Heads are movement sources at turn 0, but they are not territory yet.
   // reached remains empty until a snake legally arrives on a later turn.
@@ -106,6 +121,7 @@ TerritoryControl compute_territory_control(const Position& position) noexcept {
 
   (void)availability;
   (void)frontiers;
+  (void)claims;
   return {};
 }
 
