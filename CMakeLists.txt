@@ -22,6 +22,7 @@ add_executable(battlesnake
   src/engine/move/apply.cpp
   src/engine/move/collisions.cpp
   src/engine/move/execution.cpp
+  src/engine/move/generation.cpp
   src/engine/move/undo.cpp
   src/server/parser.cpp
 )
@@ -43,6 +44,7 @@ if(BUILD_TESTING)
     tests/engine/evaluation/test_evaluation.cpp
     tests/engine/evaluation/territory/test_territory.cpp
     tests/engine/move/test_execution.cpp
+    tests/engine/move/test_generation.cpp
     tests/server/test_parser.cpp
     src/engine/evaluation/evaluation.cpp
     src/engine/evaluation/territory/territory.cpp
@@ -53,6 +55,7 @@ if(BUILD_TESTING)
     src/engine/move/apply.cpp
     src/engine/move/collisions.cpp
     src/engine/move/execution.cpp
+    src/engine/move/generation.cpp
     src/engine/move/undo.cpp
     src/server/parser.cpp
   )
