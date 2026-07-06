@@ -10,6 +10,30 @@ namespace {
 constexpr int UNREACHED_TURN = BOARD_SQUARES * 2 + 1;
 constexpr int NO_SNAKE = -1;
 
+void remove_control(TerritoryClaims& claims, int snake_index) noexcept {
+  if (snake_index < 0 || snake_index >= MAX_SNAKES) {
+    return;
+  }
+
+  --claims.control[static_cast<std::size_t>(snake_index)];
+}
+
+void add_control(TerritoryClaims& claims, int snake_index) noexcept {
+  if (snake_index < 0 || snake_index >= MAX_SNAKES) {
+    return;
+  }
+
+  ++claims.control[static_cast<std::size_t>(snake_index)];
+}
+
+void clear_existing_control(TerritoryClaims& claims, std::size_t square_index) noexcept {
+  if (claims.contested[square_index]) {
+    return;
+  }
+
+  remove_control(claims, claims.snake[square_index]);
+}
+
 void resolve_claim(
     const Snake& snake,
     int snake_index,
@@ -20,10 +44,17 @@ void resolve_claim(
   const std::size_t square_index = static_cast<std::size_t>(square);
 
   if (turn < claims.turn[square_index]) {
+    if (claims.turn[square_index] == UNREACHED_TURN) {
+      --claims.unresolved_count;
+    } else {
+      clear_existing_control(claims, square_index);
+    }
+
     claims.snake[square_index] = snake_index;
     claims.turn[square_index] = turn;
     claims.length[square_index] = snake.length;
     claims.contested[square_index] = false;
+    add_control(claims, snake_index);
     return;
   }
 
@@ -32,13 +63,16 @@ void resolve_claim(
   }
 
   if (snake.length > claims.length[square_index]) {
+    clear_existing_control(claims, square_index);
     claims.snake[square_index] = snake_index;
     claims.length[square_index] = snake.length;
     claims.contested[square_index] = false;
+    add_control(claims, snake_index);
     return;
   }
 
   if (snake.length == claims.length[square_index]) {
+    clear_existing_control(claims, square_index);
     claims.snake[square_index] = NO_SNAKE;
     claims.contested[square_index] = true;
   }
@@ -51,6 +85,8 @@ TerritoryClaims::TerritoryClaims() noexcept {
   turn.fill(UNREACHED_TURN);
   length.fill(0);
   contested.fill(false);
+  control.fill(0);
+  unresolved_count = BOARD_SQUARES;
 }
 
 TerritoryClaims initialize_claims() noexcept {
@@ -86,13 +122,7 @@ void record_arrivals(
 }
 
 bool all_squares_resolved(const TerritoryClaims& claims) noexcept {
-  for (Square square = 0; square < BOARD_SQUARES; ++square) {
-    if (claims.turn[static_cast<std::size_t>(square)] == UNREACHED_TURN) {
-      return false;
-    }
-  }
-
-  return true;
+  return claims.unresolved_count == 0;
 }
 
 TerritoryControl count_control(
@@ -100,31 +130,7 @@ TerritoryControl count_control(
     const TerritoryClaims& claims
 ) noexcept {
   assert(position.snake_count <= MAX_SNAKES);
-
-  TerritoryControl control{};
-
-  for (Square square = 0; square < BOARD_SQUARES; ++square) {
-    const std::size_t square_index = static_cast<std::size_t>(square);
-    const int snake_index = claims.snake[square_index];
-
-    if (snake_index == NO_SNAKE || claims.contested[square_index]) {
-      continue;
-    }
-
-    assert(snake_index >= 0 && snake_index < position.snake_count);
-    if (snake_index < 0 || snake_index >= position.snake_count) {
-      continue;
-    }
-
-    const Snake& snake = position.snakes[static_cast<std::size_t>(snake_index)];
-    if (!snake.alive || snake.length == 0) {
-      continue;
-    }
-
-    ++control[static_cast<std::size_t>(snake_index)];
-  }
-
-  return control;
+  return claims.control;
 }
 
 }

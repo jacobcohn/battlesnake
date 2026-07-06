@@ -14,6 +14,8 @@ struct TerritoryClaims {
   std::array<int, BOARD_SQUARES> turn{};
   std::array<int, BOARD_SQUARES> length{};
   std::array<bool, BOARD_SQUARES> contested{};
+  TerritoryControl control{};
+  int unresolved_count = BOARD_SQUARES;
 
   TerritoryClaims() noexcept;
 };
