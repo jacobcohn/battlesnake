@@ -17,6 +17,8 @@ SearchResult search_root(Position& position, int depth, SearchContext& context) 
     return result;
   }
 
+  ++context.nodes;
+
   if (depth <= 0 || terminal(position)) {
     result.score = engine::evaluation::evaluate(position);
     result.completed = true;
@@ -68,6 +70,7 @@ SearchResult search_root(Position& position, int depth, SearchContext& context) 
       }
 
       if (worst_score <= alpha) {
+        ++context.cutoffs;
         break;
       }
     }

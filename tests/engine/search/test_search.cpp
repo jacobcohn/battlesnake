@@ -85,6 +85,8 @@ TEST_CASE("search depth zero returns static evaluation") {
 
   CHECK(result.depth == 0);
   CHECK(result.completed);
+  CHECK_FALSE(result.timed_out);
+  CHECK(result.depth_count == 0);
   CHECK(result.score == engine::evaluation::evaluate(position));
 }
 
@@ -99,7 +101,16 @@ TEST_CASE("search completes requested untimed depth") {
   const engine::search::SearchResult result = engine::search::search(position, limits);
 
   CHECK(result.completed);
+  CHECK_FALSE(result.timed_out);
   CHECK(result.depth == 2);
+  CHECK(result.depth_count == 2);
+  CHECK(result.depths[0].depth == 1);
+  CHECK(result.depths[0].completed);
+  CHECK(result.depths[0].nodes > 0);
+  CHECK(result.depths[1].depth == 2);
+  CHECK(result.depths[1].completed);
+  CHECK(result.depths[1].nodes > 0);
+  CHECK(result.depths[1].nodes >= result.depths[0].nodes);
   check_position_equals(position, before);
 }
 
@@ -114,6 +125,11 @@ TEST_CASE("search avoids immediate off-board death when survival exists") {
 
   CHECK(result.completed);
   CHECK(result.depth == 1);
+  REQUIRE(result.depth_count == 1);
+  CHECK(result.depths[0].depth == 1);
+  CHECK(result.depths[0].completed);
+  CHECK(result.depths[0].best_move == result.best_move.moves[static_cast<std::size_t>(position.you)]);
+  CHECK(result.depths[0].score == result.score);
   CHECK(result.best_move.moves[static_cast<std::size_t>(position.you)] != Move::Left);
   CHECK(result.best_move.moves[static_cast<std::size_t>(position.you)] != Move::Down);
   CHECK(result.score > engine::evaluation::LOSS_SCORE);
@@ -132,5 +148,7 @@ TEST_CASE("timed iterative deepening returns a restored position") {
 
   CHECK(result.depth >= 0);
   CHECK(result.depth <= limits.max_depth);
+  CHECK(result.depth_count >= 0);
+  CHECK(result.depth_count <= limits.max_depth);
   check_position_equals(position, before);
 }

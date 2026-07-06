@@ -6,6 +6,7 @@
 #include "engine/core/move.hpp"
 #include "engine/search/search.hpp"
 #include "server/parser.hpp"
+#include "server/logging.hpp"
 
 namespace {
 
@@ -52,6 +53,8 @@ crow::response move(const crow::request& request) {
 
     const engine::search::SearchResult result = engine::search::search(position, limits);
     const char* selected_move = move_name(result.best_move.moves[static_cast<std::size_t>(position.you)]);
+
+    log_search_result(position, result);
 
     crow::json::wvalue response_body;
     response_body["move"] = selected_move;

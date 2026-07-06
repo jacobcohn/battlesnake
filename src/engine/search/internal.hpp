@@ -18,6 +18,8 @@ inline constexpr std::array<Move, 4> ALL_MOVES{
 
 struct SearchContext {
   std::chrono::steady_clock::time_point deadline{};
+  uint64_t nodes = 0;
+  uint64_t cutoffs = 0;
   bool has_deadline = false;
   bool stopped = false;
 };

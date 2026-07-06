@@ -13,6 +13,8 @@ SearchValue search_value(Position& position, int depth, int alpha, int beta, Sea
     return SearchValue{0, false};
   }
 
+  ++context.nodes;
+
   if (depth <= 0 || terminal(position)) {
     return SearchValue{engine::evaluation::evaluate(position), true};
   }
@@ -56,6 +58,7 @@ SearchValue search_value(Position& position, int depth, int alpha, int beta, Sea
       }
 
       if (worst_score <= best_guaranteed_score) {
+        ++context.cutoffs;
         break;
       }
     }
@@ -73,6 +76,7 @@ SearchValue search_value(Position& position, int depth, int alpha, int beta, Sea
     }
 
     if (best_guaranteed_score >= beta) {
+      ++context.cutoffs;
       break;
     }
   }

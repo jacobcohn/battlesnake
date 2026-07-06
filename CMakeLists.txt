@@ -31,6 +31,7 @@ add_executable(battlesnake
   src/engine/search/search.cpp
   src/engine/search/terminal.cpp
   src/server/parser.cpp
+  src/server/logging.cpp
 )
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
@@ -71,6 +72,7 @@ if(BUILD_TESTING)
     src/engine/search/search.cpp
     src/engine/search/terminal.cpp
     src/server/parser.cpp
+    src/server/logging.cpp
   )
   target_include_directories(battlesnake_tests PRIVATE include)
   target_link_libraries(battlesnake_tests PRIVATE doctest::doctest Crow::Crow)
