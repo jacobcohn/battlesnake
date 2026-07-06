@@ -40,6 +40,10 @@ SearchResult search(Position& position, const SearchLimits& limits) noexcept {
   for (int depth = 1; depth <= max_depth; ++depth) {
     const uint64_t nodes_before = context.nodes;
     const uint64_t cutoffs_before = context.cutoffs;
+    const uint64_t tt_probes_before = context.tt_probes;
+    const uint64_t tt_hits_before = context.tt_hits;
+    const uint64_t tt_cutoffs_before = context.tt_cutoffs;
+    const uint64_t tt_stores_before = context.tt_stores;
     const std::chrono::steady_clock::time_point depth_start = std::chrono::steady_clock::now();
 
     SearchResult depth_result = internal::search_root(position, depth, context);
@@ -48,6 +52,10 @@ SearchResult search(Position& position, const SearchLimits& limits) noexcept {
     depth_info.depth = depth;
     depth_info.nodes = context.nodes - nodes_before;
     depth_info.cutoffs = context.cutoffs - cutoffs_before;
+    depth_info.tt_probes = context.tt_probes - tt_probes_before;
+    depth_info.tt_hits = context.tt_hits - tt_hits_before;
+    depth_info.tt_cutoffs = context.tt_cutoffs - tt_cutoffs_before;
+    depth_info.tt_stores = context.tt_stores - tt_stores_before;
     depth_info.elapsed_ms = elapsed_ms(depth_start);
     depth_info.completed = depth_result.completed;
 

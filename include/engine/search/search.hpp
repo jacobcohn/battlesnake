@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 
 #include "engine/core/move.hpp"
@@ -11,6 +12,8 @@ namespace engine::search {
 struct SearchLimits {
   int max_depth = 1;
   int time_limit_ms = 0;
+  bool use_transposition_table = true;
+  std::size_t transposition_table_entries = 1 << 16;
 };
 
 inline constexpr int MAX_RECORDED_DEPTHS = 64;
@@ -21,6 +24,10 @@ struct DepthInfo {
   Move best_move = Move::Up;
   uint64_t nodes = 0;
   uint64_t cutoffs = 0;
+  uint64_t tt_probes = 0;
+  uint64_t tt_hits = 0;
+  uint64_t tt_cutoffs = 0;
+  uint64_t tt_stores = 0;
   uint64_t elapsed_ms = 0;
   bool completed = false;
 };

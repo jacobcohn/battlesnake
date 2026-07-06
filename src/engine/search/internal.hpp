@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include "engine/search/search.hpp"
+#include "engine/search/transposition_table.hpp"
 
 namespace engine::search::internal {
 
@@ -18,8 +19,13 @@ inline constexpr std::array<Move, 4> ALL_MOVES{
 
 struct SearchContext {
   std::chrono::steady_clock::time_point deadline{};
+  TranspositionTable transposition_table{};
   uint64_t nodes = 0;
   uint64_t cutoffs = 0;
+  uint64_t tt_probes = 0;
+  uint64_t tt_hits = 0;
+  uint64_t tt_cutoffs = 0;
+  uint64_t tt_stores = 0;
   bool has_deadline = false;
   bool stopped = false;
 };

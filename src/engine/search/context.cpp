@@ -9,6 +9,10 @@ SearchContext make_context(const SearchLimits& limits) noexcept {
     context.deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(limits.time_limit_ms);
   }
 
+  if (limits.use_transposition_table) {
+    initialize(context.transposition_table, limits.transposition_table_entries);
+  }
+
   return context;
 }
 
