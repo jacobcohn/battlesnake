@@ -122,5 +122,79 @@ inline constexpr DirectionTable DIRECTIONS = make_direction_table();
   return DIRECTIONS[static_cast<std::size_t>(from)][static_cast<std::size_t>(to)];
 }
 
+[[nodiscard]] uint64_t compute_snake_edge_hash(const Snake& snake, std::size_t snake_index) noexcept {
+  assert(snake_index < MAX_SNAKES);
+
+  if (!snake.alive || snake.length <= 1) {
+    return 0;
+  }
+
+  assert(snake.tail >= 0 && snake.tail < BOARD_SQUARES);
+  assert(snake.head >= 0 && snake.head < BOARD_SQUARES);
+
+  uint64_t hash = 0;
+  Square current = snake.tail;
+
+  for (int visited = 0; current != snake.head && visited < BOARD_SQUARES; ++visited) {
+    const Square next = snake.next[static_cast<std::size_t>(current)];
+    assert(next >= 0 && next < BOARD_SQUARES);
+
+    const int direction = direction_index(current, next);
+    assert(direction >= 0 && direction < DIRECTION_COUNT);
+
+    hash ^= EDGE_KEYS[snake_index][static_cast<std::size_t>(current)][static_cast<std::size_t>(direction)];
+    current = next;
+  }
+
+  assert(current == snake.head);
+  return hash;
 }
+
+}
+
+uint64_t compute_space_hash(const Position& position) noexcept {
+  assert(position.snake_count <= MAX_SNAKES);
+
+  uint64_t hash = 0;
+  for (int i = 0; i < position.snake_count; ++i) {
+    const std::size_t index = static_cast<std::size_t>(i);
+    hash ^= compute_snake_edge_hash(position.snakes[index], index);
+  }
+
+  return hash;
+}
+
+uint64_t compute_exact_hash(const Position& position) noexcept {
+  assert(position.snake_count <= MAX_SNAKES);
+  assert(position.you < MAX_SNAKES);
+
+  uint64_t hash = compute_space_hash(position);
+
+  for (int square = 0; square < BOARD_SQUARES; ++square) {
+    const Square square_index = static_cast<Square>(square);
+    if (position.food.test(square_index)) {
+      hash ^= FOOD_KEYS[static_cast<std::size_t>(square)];
+    }
+  }
+
+  for (int i = 0; i < position.snake_count; ++i) {
+    const std::size_t index = static_cast<std::size_t>(i);
+    const Snake& snake = position.snakes[index];
+    if (snake.alive) {
+      assert(snake.health <= MAX_HEALTH);
+      hash ^= HEALTH_KEYS[index][static_cast<std::size_t>(snake.health)];
+    }
+  }
+
+  hash ^= turn_key(position.turn);
+  hash ^= YOU_KEYS[static_cast<std::size_t>(position.you)];
+
+  return hash;
+}
+
+void initialize_hashes(Position& position) noexcept {
+  position.space_hash = compute_space_hash(position);
+  position.exact_hash = compute_exact_hash(position);
+}
+
 }
