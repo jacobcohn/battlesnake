@@ -7,7 +7,7 @@ namespace {
 bool is_vacated_tail(const Position& position, const Undo& undo, Square square) noexcept {
   for (int i = 0; i < position.snake_count; ++i) {
     const std::size_t index = static_cast<std::size_t>(i);
-    if (undo.old_heads[index] != INVALID_SQUARE && undo.new_heads[index] != INVALID_SQUARE && !undo.ate_food[index] &&
+    if (undo.old_heads[index] != INVALID_SQUARE && undo.new_heads[index] != INVALID_SQUARE && undo.removed_tail[index] &&
         undo.old_tails[index] == square) {
       return true;
     }

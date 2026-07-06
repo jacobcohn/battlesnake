@@ -102,21 +102,28 @@ std::string parse_snake(const crow::json::rvalue& value, Snake& snake) {
   squares.reserve(body.size());
 
   BitBoard seen;
+  Square previous_square = INVALID_SQUARE;
   for (std::size_t i = 0; i < body.size(); ++i) {
     const Square square = parse_coord(body[i]);
 
+    if (square == previous_square) {
+      continue;
+    }
+
     if (seen.test(square)) {
-      throw std::runtime_error("duplicate square in snake body");
+      throw std::runtime_error("non-consecutive duplicate square in snake body");
     }
 
     seen.set(square);
     squares.push_back(square);
     snake.occupied.set(square);
+    previous_square = square;
   }
 
   snake.head = squares.front();
   snake.tail = squares.back();
   snake.length = static_cast<uint8_t>(length);
+  snake.stacked_tail_segments = static_cast<uint8_t>(length - static_cast<int>(squares.size()));
   snake.health = static_cast<uint8_t>(health);
   snake.alive = true;
 

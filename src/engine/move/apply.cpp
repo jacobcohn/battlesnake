@@ -46,6 +46,7 @@ void prepare_undo(const Position& position, Undo& undo) noexcept {
     undo.old_heads[index] = snake.head;
     undo.old_tails[index] = snake.tail;
     undo.old_health[index] = snake.health;
+    undo.old_stacked_tail_segments[index] = snake.stacked_tail_segments;
     undo.old_body_hashes[index] = snake.body_hash;
   }
 }
@@ -91,8 +92,13 @@ void remove_non_growing_tails(Position& position, Undo& undo) noexcept {
     Snake& snake = position.snakes[index];
 
     if (undo.old_heads[index] != INVALID_SQUARE && undo.new_heads[index] != INVALID_SQUARE && !undo.ate_food[index]) {
-      const bool clear_occupied = !has_new_head_on_square(position, undo, snake.tail);
-      remove_tail(position, snake, index, clear_occupied);
+      if (snake.stacked_tail_segments > 0) {
+        --snake.stacked_tail_segments;
+      } else {
+        const bool clear_occupied = !has_new_head_on_square(position, undo, snake.tail);
+        remove_tail(position, snake, index, clear_occupied);
+        undo.removed_tail[index] = true;
+      }
     }
   }
 }

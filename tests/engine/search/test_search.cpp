@@ -66,6 +66,7 @@ void check_position_equals(const Position& actual, const Position& expected) {
     CHECK(actual.snakes[index].head == expected.snakes[index].head);
     CHECK(actual.snakes[index].tail == expected.snakes[index].tail);
     CHECK(actual.snakes[index].length == expected.snakes[index].length);
+    CHECK(actual.snakes[index].stacked_tail_segments == expected.snakes[index].stacked_tail_segments);
     CHECK(actual.snakes[index].health == expected.snakes[index].health);
     CHECK(actual.snakes[index].alive == expected.snakes[index].alive);
     CHECK(actual.snakes[index].next == expected.snakes[index].next);

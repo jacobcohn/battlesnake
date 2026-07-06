@@ -83,6 +83,7 @@ void check_unmake_restores(Position& position, const Position& before, const Und
     CHECK(actual.head == expected.head);
     CHECK(actual.tail == expected.tail);
     CHECK(actual.length == expected.length);
+    CHECK(actual.stacked_tail_segments == expected.stacked_tail_segments);
     CHECK(actual.health == expected.health);
     CHECK(actual.alive == expected.alive);
     CHECK(actual.next == expected.next);
@@ -115,6 +116,86 @@ TEST_CASE("make_move updates head tail body health occupied and undo restores") 
   CHECK(position.turn == before.turn + 1);
 
   check_unmake_restores(position, before, undo);
+}
+
+TEST_CASE("stacked starting body keeps tail in place until body unstacks") {
+  Position position;
+  position.reset();
+  position.snake_count = 1;
+  position.you = 0;
+
+  Snake& snake = position.snakes[0];
+  snake.reset();
+  snake.head = idx(5, 5);
+  snake.tail = idx(5, 5);
+  snake.length = 3;
+  snake.stacked_tail_segments = 2;
+  snake.health = 100;
+  snake.alive = true;
+  snake.occupied.set(idx(5, 5));
+  init_occupied(position);
+
+  Position before = position;
+  Undo undo = make_move(position, moves(Move::Up));
+  CHECK(position.snakes[0].head == idx(5, 6));
+  CHECK(position.snakes[0].tail == idx(5, 5));
+  CHECK(position.snakes[0].length == 3);
+  CHECK(position.snakes[0].stacked_tail_segments == 1);
+  CHECK(position.snakes[0].occupied.count() == 2);
+  CHECK(position.snakes[0].occupied.test(idx(5, 5)));
+  CHECK(position.snakes[0].occupied.test(idx(5, 6)));
+  CHECK_FALSE(undo.removed_tail[0]);
+  check_unmake_restores(position, before, undo);
+
+  undo = make_move(position, moves(Move::Up));
+  before = position;
+  undo = make_move(position, moves(Move::Up));
+  CHECK(position.snakes[0].head == idx(5, 7));
+  CHECK(position.snakes[0].tail == idx(5, 5));
+  CHECK(position.snakes[0].stacked_tail_segments == 0);
+  CHECK(position.snakes[0].occupied.count() == 3);
+  CHECK_FALSE(undo.removed_tail[0]);
+
+  before = position;
+  undo = make_move(position, moves(Move::Up));
+  CHECK(position.snakes[0].head == idx(5, 8));
+  CHECK(position.snakes[0].tail == idx(5, 6));
+  CHECK(position.snakes[0].occupied.count() == 3);
+  CHECK_FALSE(position.snakes[0].occupied.test(idx(5, 5)));
+  CHECK(undo.removed_tail[0]);
+  check_unmake_restores(position, before, undo);
+}
+
+TEST_CASE("moving into a stacked tail before it vacates is a collision") {
+  Position position;
+  position.reset();
+  position.snake_count = 1;
+  position.you = 0;
+
+  Snake& snake = position.snakes[0];
+  snake.reset();
+  snake.head = idx(5, 5);
+  snake.tail = idx(5, 5);
+  snake.length = 3;
+  snake.stacked_tail_segments = 2;
+  snake.health = 100;
+  snake.alive = true;
+  snake.occupied.set(idx(5, 5));
+  init_occupied(position);
+
+  Undo undo = make_move(position, moves(Move::Up));
+  CHECK(position.snakes[0].alive);
+  CHECK(position.snakes[0].stacked_tail_segments == 1);
+  CHECK_FALSE(undo.removed_tail[0]);
+
+  const Position before_collision = position;
+  undo = make_move(position, moves(Move::Down));
+
+  CHECK_FALSE(position.snakes[0].alive);
+  CHECK_FALSE(undo.removed_tail[0]);
+  CHECK(position.occupied.empty());
+
+  check_unmake_restores(position, before_collision, undo);
 }
 
 TEST_CASE("food grows snake resets health removes food and keeps tail occupied") {

@@ -12,6 +12,7 @@ void check_snake_is_reset(const Snake& snake) {
   CHECK(snake.head == INVALID_SQUARE);
   CHECK(snake.tail == INVALID_SQUARE);
   CHECK(static_cast<int>(snake.length) == 0);
+  CHECK(static_cast<int>(snake.stacked_tail_segments) == 0);
   CHECK(static_cast<int>(snake.health) == 100);
   CHECK_FALSE(snake.alive);
   CHECK(snake.occupied.empty());
@@ -36,6 +37,7 @@ TEST_CASE("Snake reset clears all mutable state") {
   snake.head = idx(5, 5);
   snake.tail = idx(5, 3);
   snake.length = 3;
+  snake.stacked_tail_segments = 1;
   snake.health = 42;
   snake.alive = true;
   snake.occupied.set(idx(5, 5));

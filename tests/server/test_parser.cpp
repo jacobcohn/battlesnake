@@ -99,6 +99,7 @@ TEST_CASE("parse_position parses snake body linked from tail to head") {
   CHECK(snake.head == head);
   CHECK(snake.tail == tail);
   CHECK(snake.length == 3);
+  CHECK(snake.stacked_tail_segments == 0);
   CHECK(snake.health == 87);
   CHECK(snake.alive);
   CHECK(snake.next[static_cast<std::size_t>(tail)] == middle);
@@ -161,12 +162,32 @@ TEST_CASE("parse_position rejects missing own snake") {
 )json");
 }
 
-TEST_CASE("parse_position rejects duplicate squares in snake body") {
+TEST_CASE("parse_position compresses consecutive duplicate body squares") {
+  const Position position = parse_json(R"json(
+{
+  "turn": 0,
+  "board": { "height": 11, "width": 11, "food": [], "snakes": [
+    { "id": "you-id", "health": 100, "body": [ { "x": 1, "y": 1 }, { "x": 1, "y": 1 }, { "x": 1, "y": 1 } ], "length": 3 }
+  ] },
+  "you": { "id": "you-id" }
+}
+)json");
+
+  const Snake& snake = position.snakes[position.you];
+  CHECK(snake.head == idx(1, 1));
+  CHECK(snake.tail == idx(1, 1));
+  CHECK(snake.length == 3);
+  CHECK(snake.stacked_tail_segments == 2);
+  CHECK(snake.occupied.count() == 1);
+  CHECK(snake.occupied.test(idx(1, 1)));
+}
+
+TEST_CASE("parse_position rejects non-consecutive duplicate squares in snake body") {
   expect_parse_failure(R"json(
 {
   "turn": 0,
   "board": { "height": 11, "width": 11, "food": [], "snakes": [
-    { "id": "you-id", "health": 100, "body": [ { "x": 1, "y": 1 }, { "x": 1, "y": 1 } ], "length": 2 }
+    { "id": "you-id", "health": 100, "body": [ { "x": 1, "y": 1 }, { "x": 1, "y": 2 }, { "x": 1, "y": 1 } ], "length": 3 }
   ] },
   "you": { "id": "you-id" }
 }

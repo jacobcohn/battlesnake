@@ -17,6 +17,7 @@ struct Snake {
   BitBoard occupied;
   uint64_t body_hash = 0;
   uint8_t length = 0;
+  uint8_t stacked_tail_segments = 0;
   uint8_t health = 100;
   bool alive = false;
 
@@ -31,6 +32,7 @@ struct Snake {
     occupied = BitBoard{};
     body_hash = 0;
     length = 0;
+    stacked_tail_segments = 0;
     health = 100;
     alive = false;
   }

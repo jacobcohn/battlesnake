@@ -14,12 +14,13 @@ void restore_snake(Position& position, const Undo& undo, std::size_t index) noex
   }
 
   snake.health = undo.old_health[index];
+  snake.stacked_tail_segments = undo.old_stacked_tail_segments[index];
 
   if (was_valid) {
     if (did_eat) {
       --snake.length;
       position.food.set(undo.new_heads[index]);
-    } else {
+    } else if (undo.removed_tail[index]) {
       snake.next[static_cast<std::size_t>(undo.old_tails[index])] = snake.tail;
       snake.tail = undo.old_tails[index];
       snake.occupied.set(undo.old_tails[index]);
