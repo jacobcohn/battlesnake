@@ -33,6 +33,7 @@ add_executable(battlesnake
   src/engine/search/root.cpp
   src/engine/search/search.cpp
   src/engine/search/terminal.cpp
+  src/engine/search/transposition_table.cpp
   src/server/parser.cpp
   src/server/logging.cpp
 )
@@ -78,6 +79,7 @@ if(BUILD_TESTING)
     src/engine/search/root.cpp
     src/engine/search/search.cpp
     src/engine/search/terminal.cpp
+    src/engine/search/transposition_table.cpp
     src/server/parser.cpp
     src/server/logging.cpp
   )
