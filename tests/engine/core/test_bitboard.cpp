@@ -132,6 +132,73 @@ TEST_CASE("BitBoard compound operators update boards in place") {
   CHECK_FALSE(board.test(120));
 }
 
+TEST_CASE("BitBoard shifts north") {
+  BitBoard board;
+  board.set(idx(5, 5));
+  board.set(idx(10, 10));
+
+  const BitBoard shifted = board.north();
+
+  CHECK(shifted.count() == 1);
+  CHECK(shifted.test(idx(5, 6)));
+  CHECK_FALSE(shifted.test(idx(10, 10)));
+}
+
+TEST_CASE("BitBoard shifts south") {
+  BitBoard board;
+  board.set(idx(5, 5));
+  board.set(idx(0, 0));
+
+  const BitBoard shifted = board.south();
+
+  CHECK(shifted.count() == 1);
+  CHECK(shifted.test(idx(5, 4)));
+  CHECK_FALSE(shifted.test(idx(0, 0)));
+}
+
+TEST_CASE("BitBoard shifts east without wrapping") {
+  BitBoard board;
+  board.set(idx(5, 5));
+  board.set(idx(10, 0));
+  board.set(idx(10, 10));
+
+  const BitBoard shifted = board.east();
+
+  CHECK(shifted.count() == 1);
+  CHECK(shifted.test(idx(6, 5)));
+  CHECK_FALSE(shifted.test(idx(0, 1)));
+  CHECK_FALSE(shifted.test(idx(0, 0)));
+}
+
+TEST_CASE("BitBoard shifts west without wrapping") {
+  BitBoard board;
+  board.set(idx(5, 5));
+  board.set(idx(0, 0));
+  board.set(idx(0, 10));
+
+  const BitBoard shifted = board.west();
+
+  CHECK(shifted.count() == 1);
+  CHECK(shifted.test(idx(4, 5)));
+  CHECK_FALSE(shifted.test(idx(10, 9)));
+  CHECK_FALSE(shifted.test(idx(10, 10)));
+}
+
+TEST_CASE("BitBoard directional shifts cross storage boundary") {
+  BitBoard board;
+  board.set(idx(8, 5));
+  board.set(idx(9, 5));
+
+  CHECK(board.north().test(idx(8, 6)));
+  CHECK(board.north().test(idx(9, 6)));
+  CHECK(board.south().test(idx(8, 4)));
+  CHECK(board.south().test(idx(9, 4)));
+  CHECK(board.east().test(idx(9, 5)));
+  CHECK(board.east().test(idx(10, 5)));
+  CHECK(board.west().test(idx(7, 5)));
+  CHECK(board.west().test(idx(8, 5)));
+}
+
 TEST_CASE("BitBoard complement is limited to valid board squares") {
   BitBoard board;
   board.set(0);

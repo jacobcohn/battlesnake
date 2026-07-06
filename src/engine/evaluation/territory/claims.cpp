@@ -74,17 +74,12 @@ void record_arrivals(
 
     BitBoard& reached = frontiers.reached[static_cast<std::size_t>(snake_index)];
     const BitBoard& next = frontiers.next[static_cast<std::size_t>(snake_index)];
+    BitBoard arrivals = next & ~reached;
 
-    for (Square square = 0; square < BOARD_SQUARES; ++square) {
-      if (!next.test(square)) {
-        continue;
-      }
+    reached |= arrivals;
 
-      if (reached.test(square)) {
-        continue;
-      }
-
-      reached.set(square);
+    Square square = INVALID_SQUARE;
+    while (arrivals.pop_first_set_square(square)) {
       resolve_claim(snake, snake_index, claims, square, turn);
     }
   }

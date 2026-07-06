@@ -7,6 +7,7 @@
 #include "engine/core/constants.hpp"
 #include "engine/core/position.hpp"
 #include "engine/core/square.hpp"
+#include "engine/evaluation/territory/adjacency.hpp"
 #include "engine/evaluation/territory/availability.hpp"
 #include "engine/evaluation/territory/claims.hpp"
 #include "engine/evaluation/territory/frontiers.hpp"
@@ -197,6 +198,54 @@ void check_matches_reference(const Position& position) {
   CHECK(actual[1] == expected[1]);
 }
 
+}
+
+TEST_CASE("Territory adjacency expands a center square") {
+  BitBoard source;
+  source.set(idx(5, 5));
+
+  const BitBoard adjacent = engine::evaluation::adjacent_squares(source);
+
+  CHECK(adjacent.count() == 4);
+  CHECK(adjacent.test(idx(4, 5)));
+  CHECK(adjacent.test(idx(6, 5)));
+  CHECK(adjacent.test(idx(5, 4)));
+  CHECK(adjacent.test(idx(5, 6)));
+  CHECK_FALSE(adjacent.test(idx(5, 5)));
+}
+
+TEST_CASE("Territory adjacency does not wrap around board edges") {
+  BitBoard source;
+  source.set(idx(0, 0));
+  source.set(idx(10, 10));
+
+  const BitBoard adjacent = engine::evaluation::adjacent_squares(source);
+
+  CHECK(adjacent.count() == 4);
+  CHECK(adjacent.test(idx(1, 0)));
+  CHECK(adjacent.test(idx(0, 1)));
+  CHECK(adjacent.test(idx(9, 10)));
+  CHECK(adjacent.test(idx(10, 9)));
+  CHECK_FALSE(adjacent.test(idx(10, 0)));
+  CHECK_FALSE(adjacent.test(idx(0, 10)));
+}
+
+TEST_CASE("Territory adjacency unions overlapping multi-square frontiers") {
+  BitBoard source;
+  source.set(idx(5, 5));
+  source.set(idx(5, 6));
+
+  const BitBoard adjacent = engine::evaluation::adjacent_squares(source);
+
+  CHECK(adjacent.count() == 8);
+  CHECK(adjacent.test(idx(4, 5)));
+  CHECK(adjacent.test(idx(6, 5)));
+  CHECK(adjacent.test(idx(5, 4)));
+  CHECK(adjacent.test(idx(5, 6)));
+  CHECK(adjacent.test(idx(4, 6)));
+  CHECK(adjacent.test(idx(6, 6)));
+  CHECK(adjacent.test(idx(5, 5)));
+  CHECK(adjacent.test(idx(5, 7)));
 }
 
 TEST_CASE("Territory availability blocks alive bodies and ignores dead bodies") {

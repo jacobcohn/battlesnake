@@ -53,6 +53,75 @@ struct BitBoard {
     return std::popcount(low) + std::popcount(high);
   }
 
+  constexpr bool pop_first_set_square(Square& square) noexcept {
+    if (low != 0) {
+      square = static_cast<Square>(std::countr_zero(low));
+      low &= low - 1;
+      return true;
+    }
+
+    if (high != 0) {
+      square = static_cast<Square>(64 + std::countr_zero(high));
+      high &= high - 1;
+      return true;
+    }
+
+    square = INVALID_SQUARE;
+    return false;
+  }
+
+  [[nodiscard]] static constexpr BitBoard file_mask(int x) noexcept {
+    assert(x >= 0 && x < BOARD_WIDTH);
+
+    BitBoard mask;
+    for (int y = 0; y < BOARD_HEIGHT; ++y) {
+      mask.set(idx(x, y));
+    }
+    return mask;
+  }
+
+  [[nodiscard]] constexpr BitBoard shift_left(int amount) const noexcept {
+    assert(amount > 0 && amount < 64);
+
+    BitBoard shifted;
+    shifted.low = low << amount;
+    shifted.high = ((high << amount) | (low >> (64 - amount))) & HIGH_USED_MASK;
+    return shifted;
+  }
+
+  [[nodiscard]] constexpr BitBoard shift_right(int amount) const noexcept {
+    assert(amount > 0 && amount < 64);
+
+    BitBoard shifted;
+    shifted.low = (low >> amount) | (high << (64 - amount));
+    shifted.high = high >> amount;
+    return shifted;
+  }
+
+  [[nodiscard]] constexpr BitBoard north() const noexcept {
+    return shift_left(BOARD_WIDTH);
+  }
+
+  [[nodiscard]] constexpr BitBoard south() const noexcept {
+    return shift_right(BOARD_WIDTH);
+  }
+
+  [[nodiscard]] constexpr BitBoard east() const noexcept {
+    BitBoard squares = *this;
+    const BitBoard right_file = file_mask(BOARD_WIDTH - 1);
+    squares.low &= ~right_file.low;
+    squares.high &= ~right_file.high;
+    return squares.shift_left(1);
+  }
+
+  [[nodiscard]] constexpr BitBoard west() const noexcept {
+    BitBoard squares = *this;
+    const BitBoard left_file = file_mask(0);
+    squares.low &= ~left_file.low;
+    squares.high &= ~left_file.high;
+    return squares.shift_right(1);
+  }
+
   constexpr BitBoard& operator|=(BitBoard rhs) noexcept {
     low |= rhs.low;
     high |= rhs.high;
