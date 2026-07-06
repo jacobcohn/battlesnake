@@ -15,6 +15,7 @@ struct Snake {
   Square tail = INVALID_SQUARE;
   std::array<Square, BOARD_SQUARES> next{};
   BitBoard occupied;
+  uint64_t body_hash = 0;
   uint8_t length = 0;
   uint8_t health = 100;
   bool alive = false;
@@ -28,6 +29,7 @@ struct Snake {
     tail = INVALID_SQUARE;
     next.fill(INVALID_SQUARE);
     occupied = BitBoard{};
+    body_hash = 0;
     length = 0;
     health = 100;
     alive = false;

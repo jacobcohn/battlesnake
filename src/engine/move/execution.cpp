@@ -17,7 +17,7 @@ Undo make_move(Position& position, const JointMove& joint) noexcept {
   remove_dead_snakes(position, undo);
 
   ++position.turn;
-  engine::hash::initialize_hashes(position);
+  engine::hash::update_after_move(position, undo);
   return undo;
 }
 
@@ -25,6 +25,5 @@ void unmake_move(Position& position, const Undo& undo) noexcept {
   restore_snakes(position, undo);
   build_alive_occupied(position);
   --position.turn;
-  position.exact_hash = undo.old_exact_hash;
-  position.space_hash = undo.old_space_hash;
+  engine::hash::restore_after_unmake(position, undo);
 }

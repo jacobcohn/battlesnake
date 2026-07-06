@@ -13,6 +13,7 @@ struct Undo {
   std::array<Square, MAX_SNAKES> old_tails{};
   std::array<Square, MAX_SNAKES> new_heads{};
   std::array<uint8_t, MAX_SNAKES> old_health{};
+  std::array<uint64_t, MAX_SNAKES> old_body_hashes{};
   std::array<bool, MAX_SNAKES> ate_food{};
   std::array<bool, MAX_SNAKES> new_head_was_own_body{};
   std::array<bool, MAX_SNAKES> died{};
@@ -24,6 +25,7 @@ struct Undo {
     old_tails.fill(INVALID_SQUARE);
     new_heads.fill(INVALID_SQUARE);
     old_health.fill(0);
+    old_body_hashes.fill(0);
     ate_food.fill(false);
     new_head_was_own_body.fill(false);
     died.fill(false);

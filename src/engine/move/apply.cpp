@@ -2,6 +2,8 @@
 
 #include <cstddef>
 
+#include "engine/hash/zobrist.hpp"
+
 namespace {
 
 bool has_new_head_on_square(const Position& position, const Undo& undo, Square square) noexcept {
@@ -15,9 +17,11 @@ bool has_new_head_on_square(const Position& position, const Undo& undo, Square s
   return false;
 }
 
-void remove_tail(Position& position, Snake& snake, bool clear_position_occupied) noexcept {
+void remove_tail(Position& position, Snake& snake, std::size_t snake_index, bool clear_position_occupied) noexcept {
   const Square old_tail = snake.tail;
-  snake.tail = snake.next[static_cast<std::size_t>(old_tail)];
+  const Square new_tail = snake.next[static_cast<std::size_t>(old_tail)];
+  snake.body_hash ^= engine::hash::edge_hash(snake_index, old_tail, new_tail);
+  snake.tail = new_tail;
   snake.next[static_cast<std::size_t>(old_tail)] = INVALID_SQUARE;
   snake.occupied.clear(old_tail);
   if (clear_position_occupied) {
@@ -42,6 +46,7 @@ void prepare_undo(const Position& position, Undo& undo) noexcept {
     undo.old_heads[index] = snake.head;
     undo.old_tails[index] = snake.tail;
     undo.old_health[index] = snake.health;
+    undo.old_body_hashes[index] = snake.body_hash;
   }
 }
 
@@ -72,6 +77,7 @@ void move_heads(Position& position, Undo& undo) noexcept {
       continue;
     }
 
+    snake.body_hash ^= engine::hash::edge_hash(index, snake.head, new_head);
     snake.next[static_cast<std::size_t>(snake.head)] = new_head;
     snake.head = new_head;
     snake.occupied.set(new_head);
@@ -86,7 +92,7 @@ void remove_non_growing_tails(Position& position, Undo& undo) noexcept {
 
     if (undo.old_heads[index] != INVALID_SQUARE && undo.new_heads[index] != INVALID_SQUARE && !undo.ate_food[index]) {
       const bool clear_occupied = !has_new_head_on_square(position, undo, snake.tail);
-      remove_tail(position, snake, clear_occupied);
+      remove_tail(position, snake, index, clear_occupied);
     }
   }
 }
