@@ -51,6 +51,7 @@ if(BUILD_TESTING)
     tests/engine/core/test_square.cpp
     tests/engine/evaluation/test_evaluation.cpp
     tests/engine/evaluation/territory/test_territory.cpp
+    tests/engine/hash/test_zobrist.cpp
     tests/engine/move/test_execution.cpp
     tests/engine/move/test_generation.cpp
     tests/engine/search/test_search.cpp
