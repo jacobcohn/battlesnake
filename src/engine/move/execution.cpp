@@ -1,5 +1,7 @@
 #include "internal.hpp"
 
+#include "engine/hash/zobrist.hpp"
+
 Undo make_move(Position& position, const JointMove& joint) noexcept {
   Undo undo;
   prepare_undo(position, undo);
@@ -15,6 +17,7 @@ Undo make_move(Position& position, const JointMove& joint) noexcept {
   remove_dead_snakes(position, undo);
 
   ++position.turn;
+  engine::hash::initialize_hashes(position);
   return undo;
 }
 
@@ -22,4 +25,6 @@ void unmake_move(Position& position, const Undo& undo) noexcept {
   restore_snakes(position, undo);
   build_alive_occupied(position);
   --position.turn;
+  position.exact_hash = undo.old_exact_hash;
+  position.space_hash = undo.old_space_hash;
 }

@@ -19,6 +19,7 @@ add_executable(battlesnake
   src/engine/evaluation/territory/availability.cpp
   src/engine/evaluation/territory/claims.cpp
   src/engine/evaluation/territory/frontiers.cpp
+  src/engine/hash/zobrist.cpp
   src/engine/move/apply.cpp
   src/engine/move/collisions.cpp
   src/engine/move/execution.cpp
@@ -60,6 +61,7 @@ if(BUILD_TESTING)
     src/engine/evaluation/territory/availability.cpp
     src/engine/evaluation/territory/claims.cpp
     src/engine/evaluation/territory/frontiers.cpp
+    src/engine/hash/zobrist.cpp
     src/engine/move/apply.cpp
     src/engine/move/collisions.cpp
     src/engine/move/execution.cpp

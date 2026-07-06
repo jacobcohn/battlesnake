@@ -16,6 +16,8 @@ struct Undo {
   std::array<bool, MAX_SNAKES> ate_food{};
   std::array<bool, MAX_SNAKES> new_head_was_own_body{};
   std::array<bool, MAX_SNAKES> died{};
+  uint64_t old_exact_hash = 0;
+  uint64_t old_space_hash = 0;
 
   constexpr Undo() noexcept {
     old_heads.fill(INVALID_SQUARE);

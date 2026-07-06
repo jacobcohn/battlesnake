@@ -28,6 +28,9 @@ void remove_tail(Position& position, Snake& snake, bool clear_position_occupied)
 }
 
 void prepare_undo(const Position& position, Undo& undo) noexcept {
+  undo.old_exact_hash = position.exact_hash;
+  undo.old_space_hash = position.space_hash;
+
   for (int i = 0; i < position.snake_count; ++i) {
     const std::size_t index = static_cast<std::size_t>(i);
     const Snake& snake = position.snakes[index];

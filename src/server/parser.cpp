@@ -7,6 +7,7 @@
 #include "engine/core/bitboard.hpp"
 #include "engine/core/constants.hpp"
 #include "engine/core/square.hpp"
+#include "engine/hash/zobrist.hpp"
 
 namespace {
 
@@ -184,5 +185,6 @@ Position parse_position(const crow::json::rvalue& body) {
   }
 
   position.build_occupied();
+  engine::hash::initialize_hashes(position);
   return position;
 }
