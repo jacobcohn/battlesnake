@@ -36,6 +36,7 @@ add_executable(battlesnake
   src/engine/search/transposition_table.cpp
   src/server/parser.cpp
   src/server/logging.cpp
+  src/server/response.cpp
 )
 target_include_directories(battlesnake PRIVATE include)
 target_link_libraries(battlesnake PRIVATE Crow::Crow)
@@ -82,6 +83,7 @@ if(BUILD_TESTING)
     src/engine/search/transposition_table.cpp
     src/server/parser.cpp
     src/server/logging.cpp
+    src/server/response.cpp
   )
   target_include_directories(battlesnake_tests PRIVATE include)
   target_link_libraries(battlesnake_tests PRIVATE doctest::doctest Crow::Crow)

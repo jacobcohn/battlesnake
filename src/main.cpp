@@ -1,12 +1,11 @@
-#include <cstddef>
 #include <exception>
 
 #include <crow.h>
 
-#include "engine/core/move.hpp"
 #include "engine/search/search.hpp"
 #include "server/parser.hpp"
 #include "server/logging.hpp"
+#include "server/response.hpp"
 
 namespace {
 
@@ -52,13 +51,9 @@ crow::response move(const crow::request& request) {
     limits.time_limit_ms = SEARCH_TIME_LIMIT_MS;
 
     const engine::search::SearchResult result = engine::search::search(position, limits);
-    const char* selected_move = move_name(result.best_move.moves[static_cast<std::size_t>(position.you)]);
-
     log_search_result(position, result);
 
-    crow::json::wvalue response_body;
-    response_body["move"] = selected_move;
-
+    crow::json::wvalue response_body = make_move_response(position, result);
     crow::response response{response_body.dump()};
     response.set_header("Content-Type", "application/json");
     return response;
