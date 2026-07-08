@@ -1,4 +1,4 @@
-# Battlesnake Engine
+# BattleSnake Engine
 
 A C++20 adversarial decision engine for [Battlesnake](https://play.battlesnake.com/), exposed through a minimal HTTP API using Crow.
 
