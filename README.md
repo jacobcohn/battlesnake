@@ -1,6 +1,6 @@
 # BattleSnake Engine
 
-A C++20 adversarial decision engine for [Battlesnake](https://play.battlesnake.com/), exposed through a minimal HTTP API using Crow.
+A C++20 adversarial decision engine for [BattleSnake](https://play.battlesnake.com/), exposed through a minimal HTTP API using Crow.
 
 The project is primarily an algorithms and systems-engineering exercise: it models simultaneous-move game states with compact board representations, applies deterministic move simulation and undo, evaluates territory control, and searches for robust moves under a strict per-turn time budget.
 
@@ -31,7 +31,7 @@ Battlesnake request
 Important modules:
 
 ```text
-include/engine/core        Basic board, square, snake, move, and position types
+include/engine/core       Basic board, square, snake, move, and position types
 src/engine/move           Move generation, application, collision handling, and undo
 src/engine/evaluation     Static evaluation and territory-control logic
 src/engine/hash           Zobrist hash computation and updates
