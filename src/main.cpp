@@ -10,7 +10,7 @@
 namespace {
 
 constexpr int SEARCH_MAX_DEPTH = 100;
-constexpr int SEARCH_TIME_LIMIT_MS = 400;
+constexpr int SEARCH_TIME_LIMIT_MS = 300;
 
 }
 
