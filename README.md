@@ -40,11 +40,33 @@ src/server                HTTP parsing, logging, and response helpers
 src/main.cpp              Crow server entry point
 ```
 
-## Search and Evaluation
+## Search
 
-On each `/move` request, the server parses the Battlesnake state into a compact `Position`, then runs iterative deepening search with a time limit. The search evaluates each candidate move against the opponent's possible simultaneous replies and chooses the move with the best worst-case outcome.
+On each `/move` request, the server parses the Battlesnake state into a compact `Position` and runs iterative deepening minimax search. Battlesnake is a simultaneous-move game, so the engine evaluates joint moves rather than alternating single-agent turns.
 
-Terminal positions are scored as win/loss/draw states. Non-terminal positions are evaluated using territory control, rewarding reachable space for the controlled snake and penalizing opponent-controlled space.
+At each search node, the engine:
+
+1. Generates all legal move combinations for the live snakes.
+2. Groups outcomes by the controlled snake's candidate move.
+3. Simulates each candidate against the opponent's possible simultaneous replies.
+4. Scores the candidate by its worst-case opponent reply.
+5. Selects the move with the best worst-case score.
+
+This produces conservative decisions that prefer moves remaining strong under adversarial replies. Search uses make/unmake move operations so deeper plies can be explored without repeatedly copying full board state. The implementation also records node counts, cutoffs, depth reached, elapsed time, and timeout status for inspection.
+
+## Evaluation
+
+Terminal positions are scored directly as win, loss, or draw states, with earlier wins and later losses preferred.
+
+Non-terminal positions are evaluated with a territory-control heuristic. Territory is computed by expanding bitboard frontiers outward from each snake's head over future turns:
+
+- Occupied body squares are initially unavailable.
+- Tail and body squares are released over time as snakes move.
+- Squares are claimed by the snake that can reach them first.
+- If snakes arrive at the same time, the longer snake controls the square.
+- Equal-length simultaneous arrivals are treated as contested.
+
+The final heuristic is the controlled snake's reachable territory minus the opponent's reachable territory. This encourages moves that preserve mobility, deny space, and avoid positions where the opponent can force a trap.
 
 ## Future Improvements
 
