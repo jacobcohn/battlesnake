@@ -4,7 +4,7 @@
 
 #include "engine/search/search.hpp"
 #include "server/parser.hpp"
-#include "server/logging.hpp"
+// #include "server/logging.hpp"
 #include "server/response.hpp"
 
 namespace {
@@ -51,7 +51,7 @@ crow::response move(const crow::request& request) {
     limits.time_limit_ms = SEARCH_TIME_LIMIT_MS;
 
     const engine::search::SearchResult result = engine::search::search(position, limits);
-    log_search_result(position, result);
+    // log_search_result(position, result);
 
     crow::json::wvalue response_body = make_move_response(position, result);
     crow::response response{response_body.dump()};
