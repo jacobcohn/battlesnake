@@ -2,7 +2,15 @@
 
 A C++20 adversarial decision engine for [BattleSnake](https://play.battlesnake.com/), exposed through a minimal HTTP API using Crow.
 
-The project is primarily an algorithms and systems-engineering exercise: it models simultaneous-move game states with compact board representations, applies deterministic move simulation and undo, evaluates territory control, and searches for robust moves under a strict per-turn time budget.
+The project is primarily an algorithms and systems-engineering exercise: it models simultaneous-move game states with compact board representations, applies deterministic move simulation and undo, evaluates territory control, and searches for robust moves under a strict per-turn time budget. It had previously reached 12th place on the Battlesnake Duels leaderboard.
+
+## Competitive Results
+
+- **Peak ranking:** 12th place on the Battlesnake Duels leaderboard.
+- **Competition format:** Head-to-head games against other Battlesnake engines.
+- **Current status:** No longer actively deployed or competing.
+
+The engine achieved its peak ranking using adversarial minimax search, simultaneous-move simulation, and territory-control evaluation.
 
 ## Technical Highlights
 
